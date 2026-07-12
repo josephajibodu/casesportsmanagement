@@ -1,5 +1,15 @@
 import { Link } from '@inertiajs/react';
-import { BookOpen, FolderGit2, LayoutGrid } from 'lucide-react';
+import {
+    LayoutGrid,
+    Users,
+    Newspaper,
+    UserRound,
+    Images,
+    Handshake,
+    Mail,
+    Settings2,
+    Globe,
+} from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
@@ -13,28 +23,21 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
-import { dashboard } from '@/routes';
 import type { NavItem } from '@/types';
 
 const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
+    { title: 'Dashboard', href: '/admin', icon: LayoutGrid },
+    { title: 'Players & Coaches', href: '/admin/talents', icon: Users },
+    { title: 'News & Press', href: '/admin/news', icon: Newspaper },
+    { title: 'Team', href: '/admin/team', icon: UserRound },
+    { title: 'Gallery', href: '/admin/media', icon: Images },
+    { title: 'Partners', href: '/admin/partners', icon: Handshake },
+    { title: 'Enquiries', href: '/admin/enquiries', icon: Mail },
+    { title: 'Site Settings', href: '/admin/site-settings', icon: Settings2 },
 ];
 
 const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: FolderGit2,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
+    { title: 'View website', href: '/', icon: Globe },
 ];
 
 export function AppSidebar() {
@@ -44,7 +47,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
+                            <Link href="/admin" prefetch>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

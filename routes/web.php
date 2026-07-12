@@ -41,10 +41,11 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 Route::view('/coming-soon', 'coming-soon')->name('coming-soon');
 
 /*
-| Authenticated admin (Inertia + React)
+| Authenticated admin (Inertia + React) — see routes/admin.php
 */
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('dashboard', 'dashboard')->name('dashboard');
-});
+Route::middleware(['auth', 'verified'])
+    ->get('dashboard', fn () => redirect()->route('admin.dashboard'))
+    ->name('dashboard');
 
+require __DIR__.'/admin.php';
 require __DIR__.'/settings.php';

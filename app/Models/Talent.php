@@ -87,6 +87,18 @@ class Talent extends Model
         return 'slug';
     }
 
+    /**
+     * Resolve by id for numeric route values (admin) and by slug otherwise (public).
+     */
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        if ($field === null && is_numeric($value)) {
+            return $this->newQuery()->find($value);
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
+
     public function isCoach(): bool
     {
         return $this->type === 'coach';

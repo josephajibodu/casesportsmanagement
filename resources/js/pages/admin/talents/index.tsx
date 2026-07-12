@@ -1,0 +1,132 @@
+import { Head, Link, router } from '@inertiajs/react';
+import { Pencil, Plus, Star, Trash2 } from 'lucide-react';
+import Heading from '@/components/heading';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+type TalentRow = {
+    id: number;
+    full_name: string;
+    type: string;
+    position: string | null;
+    nationality: string | null;
+    photo_url: string | null;
+    is_featured: boolean;
+    status: string;
+};
+
+export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
+    function destroy(row: TalentRow) {
+        if (confirm(`Delete ${row.full_name}? This cannot be undone.`)) {
+            router.delete(`/admin/talents/${row.id}`, { preserveScroll: true });
+        }
+    }
+
+    function toggleFeatured(row: TalentRow) {
+        router.patch(`/admin/talents/${row.id}/featured`, {}, { preserveScroll: true });
+    }
+
+    return (
+        <>
+            <Head title="Players & Coaches" />
+
+            <div className="space-y-6 p-4">
+                <div className="flex items-center justify-between gap-4">
+                    <Heading title="Players & Coaches" description="Manage represented talent" />
+                    <Button asChild>
+                        <Link href="/admin/talents/create">
+                            <Plus className="size-4" /> Add profile
+                        </Link>
+                    </Button>
+                </div>
+
+                <div className="overflow-hidden rounded-xl border">
+                    <table className="w-full text-sm">
+                        <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
+                            <tr>
+                                <th className="p-3 font-medium">Name</th>
+                                <th className="p-3 font-medium">Type</th>
+                                <th className="hidden p-3 font-medium sm:table-cell">Position</th>
+                                <th className="p-3 font-medium">Status</th>
+                                <th className="p-3 font-medium">Featured</th>
+                                <th className="p-3 text-right font-medium">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y">
+                            {talents.length === 0 && (
+                                <tr>
+                                    <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                                        No profiles yet. Add your first player or coach.
+                                    </td>
+                                </tr>
+                            )}
+                            {talents.map((row) => (
+                                <tr key={row.id} className="hover:bg-accent/30">
+                                    <td className="p-3">
+                                        <div className="flex items-center gap-3">
+                                            <div className="size-9 shrink-0 overflow-hidden rounded-full bg-muted">
+                                                {row.photo_url && (
+                                                    <img src={row.photo_url} alt="" className="size-full object-cover" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <div className="font-medium">{row.full_name}</div>
+                                                <div className="text-xs text-muted-foreground">{row.nationality}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="p-3 capitalize">{row.type}</td>
+                                    <td className="hidden p-3 sm:table-cell">{row.position ?? '—'}</td>
+                                    <td className="p-3">
+                                        <Badge variant={row.status === 'published' ? 'default' : 'secondary'}>
+                                            {row.status}
+                                        </Badge>
+                                    </td>
+                                    <td className="p-3">
+                                        <button
+                                            type="button"
+                                            onClick={() => toggleFeatured(row)}
+                                            aria-label="Toggle featured"
+                                        >
+                                            <Star
+                                                className={
+                                                    row.is_featured
+                                                        ? 'size-5 fill-amber-400 text-amber-400'
+                                                        : 'size-5 text-muted-foreground'
+                                                }
+                                            />
+                                        </button>
+                                    </td>
+                                    <td className="p-3">
+                                        <div className="flex justify-end gap-1">
+                                            <Button asChild variant="ghost" size="icon">
+                                                <Link href={`/admin/talents/${row.id}/edit`} aria-label="Edit">
+                                                    <Pencil className="size-4" />
+                                                </Link>
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => destroy(row)}
+                                                aria-label="Delete"
+                                            >
+                                                <Trash2 className="size-4 text-destructive" />
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </>
+    );
+}
+
+TalentsIndex.layout = {
+    breadcrumbs: [
+        { title: 'Dashboard', href: '/admin' },
+        { title: 'Players & Coaches', href: '/admin/talents' },
+    ],
+};

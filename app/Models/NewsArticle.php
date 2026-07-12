@@ -80,6 +80,18 @@ class NewsArticle extends Model
     }
 
     /**
+     * Resolve by id for numeric route values (admin) and by slug otherwise (public).
+     */
+    public function resolveRouteBinding($value, $field = null): ?Model
+    {
+        if ($field === null && is_numeric($value)) {
+            return $this->newQuery()->find($value);
+        }
+
+        return parent::resolveRouteBinding($value, $field);
+    }
+
+    /**
      * @param  Builder<NewsArticle>  $query
      */
     public function scopePublished(Builder $query): void
