@@ -1,14 +1,271 @@
 @import 'tailwindcss';
 
-@import './theme.css';
-
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
-@custom-variant dark (&:is(.dark *));
+/*
+| CaSe Sports Management — public site design system
+|
+| Brand direction: a premium, midnight-navy base with an emerald primary and a
+| warm gold accent. Elegant Fraunces serif for display headlines, Instrument Sans
+| for body, and condensed Oswald for sporty uppercase labels and tickers.
+*/
+@theme {
+    /* Fonts (families resolved by the @fonts directive) */
+    --font-sans:
+        var(--font-sans-family, 'Instrument Sans'), ui-sans-serif, system-ui,
+        sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-serif:
+        var(--font-serif-family, 'Fraunces'), ui-serif, Georgia, 'Times New Roman',
+        serif;
+    --font-condensed:
+        var(--font-condensed-family, 'Oswald'), var(--font-sans-family, 'Instrument Sans'),
+        ui-sans-serif, sans-serif;
+
+    /* Ink (midnight navy) scale */
+    --color-ink: #060b14;
+    --color-ink-950: #070d18;
+    --color-ink-900: #0a1322;
+    --color-ink-800: #0f1c30;
+    --color-ink-700: #17273f;
+
+    /* Emerald primary */
+    --color-brand-50: #ecfdf5;
+    --color-brand-300: #6ee7b7;
+    --color-brand-400: #34d399;
+    --color-brand-500: #10b981;
+    --color-brand-600: #059669;
+    --color-brand-700: #047857;
+
+    /* Gold accent */
+    --color-gold-200: #f4e2a8;
+    --color-gold-300: #ecd07a;
+    --color-gold-400: #e2bd55;
+    --color-gold-500: #d4af37;
+    --color-gold-600: #b8942a;
+    --color-gold-700: #9a7b1c;
+
+    /* Neutral text on dark */
+    --color-mist: #cbd5e1;
+    --color-mist-dim: #94a3b8;
+    --color-mist-faint: #64748b;
+
+    /* Light ("paper") sections */
+    --color-paper: #f4f6f9;
+    --color-paper-2: #eaeef3;
+}
 
 @layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
     body {
-        @apply font-sans antialiased;
+        @apply bg-ink font-sans text-mist antialiased;
+    }
+
+    ::selection {
+        background-color: var(--color-brand-500);
+        color: #04140d;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        @apply font-serif text-white;
+        text-wrap: balance;
+    }
+}
+
+@layer components {
+    /* Constrained content width */
+    .shell {
+        @apply mx-auto w-full max-w-7xl px-6 sm:px-8 lg:px-12;
+    }
+
+    /* Condensed uppercase label used for eyebrows and section kickers */
+    .eyebrow {
+        @apply inline-flex items-center gap-2 font-condensed text-xs font-semibold uppercase tracking-[0.28em] text-brand-400;
+    }
+
+    .eyebrow-gold {
+        @apply text-gold-400;
+    }
+
+    /* Section vertical rhythm */
+    .section {
+        @apply py-20 sm:py-24 lg:py-28;
+    }
+
+    /* Light section — alternates with the dark ink base for rhythm */
+    .section-light {
+        background-color: var(--color-paper);
+        color: #475569; /* slate-600 */
+    }
+
+    .section-light-alt {
+        background-color: var(--color-paper-2);
+        color: #475569;
+    }
+
+    /* Primary + secondary buttons */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold transition;
+    }
+
+    .btn-primary {
+        @apply bg-brand-500 text-ink hover:bg-brand-400;
+    }
+
+    .btn-gold {
+        @apply bg-gold-500 text-ink hover:bg-gold-400;
+    }
+
+    .btn-ghost {
+        @apply border border-white/15 text-white hover:border-white/40 hover:bg-white/5;
+    }
+
+    /* Ghost button for light sections */
+    .btn-outline {
+        @apply border border-slate-300 text-slate-700 hover:border-slate-900 hover:bg-slate-900/[0.04];
+    }
+
+    /* Card surfaces */
+    .surface {
+        @apply rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-sm;
+    }
+
+    /* Light card — for use inside .section-light */
+    .card-light {
+        @apply rounded-2xl border border-slate-200 bg-white shadow-sm;
+    }
+
+    /* Form fields */
+    .field {
+        @apply w-full rounded-xl border border-white/10 bg-ink-800 px-4 py-3 text-sm text-white placeholder:text-mist-faint focus:border-brand-400 focus:outline-none;
+    }
+
+    .field-light {
+        @apply border-slate-300 bg-white text-slate-900 placeholder:text-slate-400 focus:border-brand-500;
+    }
+
+    /* Filter chip (gallery categories) */
+    .filter-chip {
+        @apply rounded-full border border-white/15 px-4 py-2 font-condensed text-xs font-semibold uppercase tracking-wider text-mist-dim transition hover:text-white;
+    }
+
+    .filter-chip.is-active {
+        @apply border-transparent bg-brand-500 text-ink;
+    }
+
+    /* Faint pitch-line grid backdrop */
+    .pitch-grid {
+        background-image:
+            linear-gradient(to right, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+        background-size: 4rem 4rem;
+        -webkit-mask-image: radial-gradient(ellipse at center, black, transparent 82%);
+        mask-image: radial-gradient(ellipse at center, black, transparent 82%);
+    }
+
+    /* Stronger, emerald-tinted pitch lines for the hero */
+    .pitch-grid-hero {
+        background-image:
+            linear-gradient(to right, rgba(52, 211, 153, 0.12) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(52, 211, 153, 0.12) 1px, transparent 1px);
+        background-size: 3.5rem 3.5rem;
+        -webkit-mask-image: radial-gradient(ellipse 85% 75% at center, black, transparent 92%);
+        mask-image: radial-gradient(ellipse 85% 75% at center, black, transparent 92%);
+    }
+
+    /* Centre-circle + halfway-line motif overlay for the hero pitch */
+    .pitch-markings {
+        background-image:
+            radial-gradient(circle at 50% 50%, transparent 7.5rem, rgba(52, 211, 153, 0.16) 7.5rem, rgba(52, 211, 153, 0.16) calc(7.5rem + 1px), transparent calc(7.5rem + 1px)),
+            linear-gradient(to right, transparent calc(50% - 0.5px), rgba(52, 211, 153, 0.14) calc(50% - 0.5px), rgba(52, 211, 153, 0.14) calc(50% + 0.5px), transparent calc(50% + 0.5px));
+        -webkit-mask-image: radial-gradient(ellipse 80% 80% at center, black, transparent 85%);
+        mask-image: radial-gradient(ellipse 80% 80% at center, black, transparent 85%);
+    }
+
+    /* Prose for rich-text bodies rendered on dark surfaces */
+    .prose-dark {
+        @apply text-[1.05rem] leading-relaxed text-mist;
+    }
+
+    .prose-dark p {
+        @apply mb-5;
+    }
+
+    .prose-dark h2,
+    .prose-dark h3 {
+        @apply mt-10 mb-4;
+    }
+
+    .prose-dark a {
+        @apply text-brand-300 underline underline-offset-4;
+    }
+
+    .prose-dark ul {
+        @apply mb-5 list-disc space-y-2 pl-5;
+    }
+
+    /* Prose for rich-text bodies on light surfaces */
+    .prose-light {
+        @apply text-[1.05rem] leading-relaxed text-slate-600;
+    }
+
+    .prose-light p {
+        @apply mb-5;
+    }
+
+    .prose-light h2,
+    .prose-light h3 {
+        @apply mt-10 mb-4 text-slate-900;
+    }
+
+    .prose-light a {
+        @apply text-brand-600 underline underline-offset-4;
+    }
+
+    .prose-light ul {
+        @apply mb-5 list-disc space-y-2 pl-5;
+    }
+}
+
+@layer utilities {
+    .text-balance {
+        text-wrap: balance;
+    }
+
+    /* Kinetic marquee (Calcio-inspired ticker) */
+    @keyframes marquee {
+        from {
+            transform: translateX(0);
+        }
+        to {
+            transform: translateX(-50%);
+        }
+    }
+
+    .animate-marquee {
+        animation: marquee 30s linear infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .animate-marquee {
+            animation: none;
+        }
+        html {
+            scroll-behavior: auto;
+        }
+    }
+
+    /* Gold text gradient for accent words */
+    .text-gold-gradient {
+        background: linear-gradient(120deg, var(--color-gold-300), var(--color-gold-500));
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
     }
 }

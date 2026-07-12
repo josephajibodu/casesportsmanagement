@@ -14,7 +14,17 @@ export default defineConfig({
             ],
             fonts: [
                 bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
+                    weights: [400, 500, 600, 700],
+                    variable: '--font-sans-family',
+                }),
+                bunny('Fraunces', {
+                    weights: [400, 500, 600, 700, 900],
+                    styles: ['normal', 'italic'],
+                    variable: '--font-serif-family',
+                }),
+                bunny('Oswald', {
+                    weights: [500, 600, 700],
+                    variable: '--font-condensed-family',
                 }),
             ],
         }),
