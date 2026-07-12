@@ -1,0 +1,14 @@
+@import 'tailwindcss';
+
+@import './theme.css';
+
+@source '../views';
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+    body {
+        @apply font-sans antialiased;
+    }
+}
