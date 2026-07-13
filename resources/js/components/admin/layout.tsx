@@ -30,8 +30,8 @@ export function PageHeader({
 }
 
 /**
- * Filament-style section: heading/description in an aside column,
- * fields in a card beside it.
+ * Filament-style section card: heading/description sit on top of the
+ * section, with the fields spanning the full width below.
  */
 export function FormSection({
     title,
@@ -43,14 +43,14 @@ export function FormSection({
     children: ReactNode;
 }) {
     return (
-        <section className="grid gap-4 lg:grid-cols-3 lg:gap-8">
-            <div className="lg:col-span-1">
-                <h2 className="text-base font-semibold">{title}</h2>
-                {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
-            </div>
-            <div className="lg:col-span-2">
-                <div className="space-y-5 rounded-xl border bg-card p-6 shadow-sm">{children}</div>
-            </div>
+        <section className="overflow-hidden rounded-xl border bg-card shadow-sm">
+            {(title || description) && (
+                <div className="border-b bg-muted/30 px-6 py-4">
+                    {title && <h2 className="text-base font-semibold">{title}</h2>}
+                    {description && <p className="mt-0.5 text-sm text-muted-foreground">{description}</p>}
+                </div>
+            )}
+            <div className="space-y-5 p-6">{children}</div>
         </section>
     );
 }
