@@ -7,8 +7,8 @@
         @php
             $metaTitle = trim($__env->yieldContent('title', $settings->agency_name));
             $pageTitle = $metaTitle === $settings->agency_name
-                ? $settings->agency_name.' — FIFA-Licensed Football Agency'
-                : $metaTitle.' — '.$settings->agency_name;
+                ? $settings->agency_name.' | FIFA-Licensed Football Agency'
+                : $metaTitle.' | '.$settings->agency_name;
             $metaDescription = trim($__env->yieldContent('meta_description', $settings->tagline ?? ''));
             $ogImage = $__env->yieldContent('og_image', asset('favicon.svg'));
         @endphp
@@ -37,7 +37,7 @@
 
         @fonts
 
-        @vite(['resources/css/static.css'], 'build-static')
+        @vite(['resources/css/static.css', 'resources/js/static.js'], 'build-static')
 
         @stack('head')
     </head>

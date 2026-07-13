@@ -8,7 +8,7 @@
         <div>
             <a href="{{ route('home') }}" class="flex items-center gap-3">
                 <x-brand-mark class="h-10 w-10" />
-                <span class="font-condensed text-xl font-bold uppercase tracking-wide text-white">
+                <span class="font-serif text-xl font-semibold tracking-tight text-white">
                     CaSe <span class="text-gold-400">Sports</span>
                 </span>
             </a>

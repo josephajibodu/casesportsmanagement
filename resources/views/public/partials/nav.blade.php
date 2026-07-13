@@ -15,7 +15,7 @@
     <nav class="shell flex h-18 items-center justify-between gap-6">
         <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="{{ $settings->agency_name }} home">
             <x-brand-mark class="h-9 w-9" />
-            <span class="hidden font-condensed text-lg font-bold uppercase tracking-wide text-white sm:block">
+            <span class="hidden font-serif text-lg font-semibold tracking-tight text-white sm:block">
                 CaSe <span class="text-gold-400">Sports</span>
             </span>
         </a>

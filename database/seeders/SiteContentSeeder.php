@@ -9,6 +9,8 @@ use App\Models\SiteSetting;
 use App\Models\Talent;
 use App\Models\TeamMember;
 use Illuminate\Database\Seeder;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class SiteContentSeeder extends Seeder
@@ -37,26 +39,30 @@ class SiteContentSeeder extends Seeder
 
         SiteSetting::create([
             'agency_name' => 'CaSe Sports Management',
-            'tagline' => 'Elite football representation with a personal touch.',
-            'agency_story' => 'CaSe Sports Management is a FIFA-licensed football agency dedicated to representing '
-                .'players and coaches across the global game. We combine professional excellence with a genuinely '
-                .'personal approach — guiding every client through contracts, transfers, and the long arc of a '
-                .'career both on and off the pitch. Operating internationally, we connect talent with the right '
-                .'clubs, scouts, and opportunities at every level of the game.',
-            'mission' => 'To build lasting careers through trusted relationships, strategic decision-making, and '
-                .'dedicated day-to-day support for every player and coach we represent.',
-            'vision' => 'To be the representation partner of choice for ambitious footballers worldwide — known for '
-                .'integrity, reach, and a relentless commitment to our clients.',
-            'fifa_license_info' => 'FIFA Licensed Football Agent — License No. 202401-CSM',
+            'tagline' => 'FIFA-licensed representation for players, clubs and national football associations.',
+            'agency_story' => 'CaSe Sports Management is a sports management company. We are a team of FIFA licensed '
+                .'agents, former sporting directors with years of experience in football management. We provide '
+                .'professional solutions for players, football teams and national football associations. One of our '
+                ."key areas of operations is in organizing preparatory trainings for football academy across Africa.\n\n"
+                ."CaSe Sports Management has also advised some of the World's largest Clubs, Sponsors and Brands in "
+                .'relation to player placement and sponsorship and marketing Projects.',
+            'mission' => 'To provide professional solutions for players, clubs and national associations, building '
+                .'lasting careers through trusted relationships, strategic guidance and dedicated day-to-day support.',
+            'vision' => 'To be the representation partner of choice across Africa and the global game, known for '
+                .'integrity, reach, and a genuine player-first philosophy.',
+            'fifa_license_info' => 'FIFA Licensed Football Agent, Licence N° FIFA: 202606-12910',
             'services' => [
-                ['group' => 'On the Field', 'title' => 'Player Representation', 'description' => 'Full representation with dedicated, personal support at every stage of a career.'],
-                ['group' => 'On the Field', 'title' => 'Contract Negotiation', 'description' => 'Expert legal and commercial negotiation to secure the best possible terms.'],
-                ['group' => 'On the Field', 'title' => 'Transfers & Opportunities', 'description' => 'Access to an extensive global network of clubs, scouts, and decision-makers.'],
-                ['group' => 'On the Field', 'title' => 'Career Management', 'description' => 'Strategic planning for sustainable, long-term development on the pitch.'],
-                ['group' => 'Off the Field', 'title' => 'Legal Support', 'description' => 'Comprehensive legal guidance from first contract to dispute resolution.'],
-                ['group' => 'Off the Field', 'title' => 'Marketing & Branding', 'description' => 'Building a personal brand and securing meaningful commercial partnerships.'],
-                ['group' => 'Off the Field', 'title' => 'Media & PR', 'description' => 'Professional media management and reputation building for our clients.'],
-                ['group' => 'Off the Field', 'title' => 'Performance Analysis', 'description' => 'Data and video analysis to support development and inform decisions.'],
+                ['group' => '', 'title' => 'Contract Negotiation', 'description' => 'Securing the best possible terms with clubs, coaches and federations.'],
+                ['group' => '', 'title' => 'Marketing', 'description' => 'Building your profile and reach through targeted marketing.'],
+                ['group' => '', 'title' => 'Endorsements', 'description' => 'Connecting players with the right commercial and endorsement deals.'],
+                ['group' => '', 'title' => 'Financial Advice', 'description' => 'Guidance on managing and growing your finances throughout your career.'],
+                ['group' => '', 'title' => 'Image Rights', 'description' => 'Protecting and managing your image rights and commercial identity.'],
+                ['group' => '', 'title' => 'Career Strategy', 'description' => 'Long-term planning to guide every step of your career.'],
+                ['group' => '', 'title' => 'Mortgages', 'description' => 'Support with mortgages and property decisions at home and abroad.'],
+                ['group' => '', 'title' => 'Personal Holiday Service Worldwide', 'description' => 'Bespoke travel and holiday planning anywhere in the world.'],
+                ['group' => '', 'title' => 'Club Network', 'description' => 'Access to an extensive network of clubs, scouts and associations.'],
+                ['group' => '', 'title' => 'Lifestyle Management', 'description' => 'Day-to-day lifestyle support so you can focus on football.'],
+                ['group' => '', 'title' => 'Media Training', 'description' => 'Preparing players to handle media and public appearances with confidence.'],
             ],
             'stats' => [
                 ['value' => '20+', 'label' => 'Players Represented'],
@@ -178,30 +184,62 @@ class SiteContentSeeder extends Seeder
         TeamMember::query()->delete();
 
         $members = [
-            ['full_name' => 'Charles Sena', 'title' => 'Founder & Managing Director', 'seed' => 'charles',
-                'bio' => 'FIFA-licensed agent and founder of CaSe Sports Management, Charles brings over a decade of '
-                    .'experience across international football markets, combining legal expertise with a genuine '
-                    .'commitment to every client he represents.'],
-            ['full_name' => 'Elena Rossi', 'title' => 'Head of Recruitment', 'seed' => 'elena',
-                'bio' => 'Elena leads scouting and recruitment, drawing on an extensive European network to identify '
-                    .'and develop emerging talent.'],
-            ['full_name' => 'David Okoro', 'title' => 'Legal Counsel', 'seed' => 'david',
-                'bio' => 'David oversees all contractual and legal matters, ensuring every deal protects our clients\' '
-                    .'interests from first draft to final signature.'],
-            ['full_name' => 'Mia Andersen', 'title' => 'Player Liaison & Communications', 'seed' => 'mia',
-                'bio' => 'Mia manages day-to-day player support, media, and communications, keeping our clients focused '
-                    .'on what matters most — their football.'],
+            ['full_name' => 'Che Claud Tamanji', 'title' => 'Lead FIFA Agent', 'photo' => 'che-claud-tamanji.jpg',
+                'bio' => 'Che Claud Tamanji is a licensed FIFA Agent and the Lead FIFA Agent at CaSe Sports Management, '
+                    .'dedicated to identifying, developing, and representing football talent with professionalism, '
+                    ."integrity, and a long-term vision for success.\n\n"
+                    .'With a strong understanding of the modern football landscape and the global transfer market, Che '
+                    .'works closely with players at different stages of their careers, providing strategic guidance both '
+                    .'on and off the pitch. His approach combines athlete representation, career planning, contract '
+                    .'negotiation, transfer management, and personal development to help players maximise their potential '
+                    ."and build sustainable careers.\n\n"
+                    .'At CaSe Sports Management, Che leads with a player-first philosophy, focused on creating '
+                    ."opportunities that align with each athlete's sporting ambitions, personal values, and long-term "
+                    .'goals. He believes that successful representation goes beyond securing contracts. It means building '
+                    .'trusted relationships, opening the right doors, and supporting players throughout every stage of '
+                    ."their journey.\n\n"
+                    .'Driven by excellence and committed to delivering results, Che continues to build pathways for '
+                    .'football talent while maintaining the highest professional standards in the game.'],
+            ['full_name' => 'Mahmoud Bin Saed', 'title' => 'Chief Administrative Officer', 'photo' => 'mahmoud-bin-saed.jpg',
+                'bio' => 'Mahmoud Bin Saed, Cameroonian born, is the Chief Administrative Officer of CaSe Sports '
+                    ."Management.\n\n"
+                    ."He is an international players intermediary and has over 15 years' of experience in the business of "
+                    .'negotiating contracts with players and coaches as well as between clubs and national football '
+                    ."squads.\n\n"
+                    .'He is also a specialist in organizing local, national and international matches, friendlies between '
+                    .'football federations across the globe, with a regulation as match agent.'],
+            ['full_name' => 'Boban Ivanovic', 'title' => 'Director of Football', 'photo' => 'boban-ivanovic.jpg',
+                'bio' => 'Boban Ivanovic is a Serbian former footballer, Director of football for CaSe Sports '
+                    .'Management. He has vast experience in overseeing the administrative, logistical, and day-to-day '
+                    ."management of football programs, scouting, tournaments and player welfare. As a former player he's "
+                    .'well connected on and off the pitch.'],
         ];
 
         foreach ($members as $i => $m) {
             TeamMember::create([
                 'full_name' => $m['full_name'],
                 'title' => $m['title'],
-                'photo' => $this->img($m['seed'], 800, 800),
+                'photo' => $this->storeTeamPhoto($m['photo']),
                 'bio' => $m['bio'],
                 'sort_order' => $i,
             ]);
         }
+    }
+
+    /**
+     * Copy a bundled team photo onto the public disk and return its stored path.
+     */
+    protected function storeTeamPhoto(string $file): ?string
+    {
+        $source = database_path("seeders/assets/team/{$file}");
+
+        if (! is_file($source)) {
+            return null;
+        }
+
+        Storage::disk('public')->putFileAs('team', new File($source), $file);
+
+        return "team/{$file}";
     }
 
     protected function seedPartners(): void

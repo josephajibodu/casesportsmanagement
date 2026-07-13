@@ -6,7 +6,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/static.css'],
+            input: ['resources/css/static.css', 'resources/js/static.js'],
             buildDirectory: 'build-static',
             refresh: [
                 'resources/views/**',

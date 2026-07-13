@@ -1,7 +1,7 @@
 @extends('layouts.public')
 
 @section('title', 'Gallery')
-@section('meta_description', 'Photos and videos from ' . $settings->agency_name . ' — events, matches, interviews, and highlights.')
+@section('meta_description', 'Photos and videos from ' . $settings->agency_name . ': events, matches, interviews, and highlights.')
 
 @section('content')
     <section class="relative overflow-hidden border-b border-white/10">

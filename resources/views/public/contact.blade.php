@@ -1,14 +1,14 @@
 @extends('layouts.public')
 
 @section('title', 'Contact')
-@section('meta_description', 'Get in touch with ' . $settings->agency_name . ' — for players, clubs, press, and partnership enquiries.')
+@section('meta_description', 'Get in touch with ' . $settings->agency_name . ' for players, clubs, press, and partnership enquiries.')
 
 @section('content')
     <section class="relative overflow-hidden border-b border-white/10">
         <div class="pitch-grid pointer-events-none absolute inset-0"></div>
         <div class="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_-10%,rgba(16,185,129,0.15),transparent)]"></div>
         <div class="shell relative py-20 sm:py-24">
-            <x-section-heading eyebrow="Get in touch" title="Start the conversation" intro="Whether you're a player, club, or partner — we'd love to hear from you." />
+            <x-section-heading eyebrow="Get in touch" title="Start the conversation" intro="Whether you're a player, club, or partner, we'd love to hear from you." />
         </div>
     </section>
 

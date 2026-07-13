@@ -24,7 +24,7 @@
 
             <p class="mt-7 max-w-2xl text-lg leading-relaxed text-mist">
                 {{ $settings->tagline ?: 'Elite football representation, tailored for long-term success.' }}
-                We guide players and coaches through every stage of their careers — on and off the pitch.
+                We guide players and coaches through every stage of their careers, on and off the pitch.
             </p>
 
             <div class="mt-10 flex flex-col gap-3 sm:flex-row">
@@ -67,22 +67,21 @@
                 <x-section-heading
                     light
                     eyebrow="What we do"
-                    title="Complete career management"
-                    intro="A full-service agency supporting our clients across every dimension of the professional game."
+                    title="Player services"
+                    intro="At CaSe Sports Management we offer a dedicated players/family support service to ensure all of our clients off the field matters and requests are dealt with."
                 />
 
-                @php $grouped = collect($settings->services)->groupBy('group'); @endphp
-                <div class="mt-14 grid gap-12 lg:grid-cols-2">
-                    @foreach ($grouped as $group => $services)
-                        <div>
-                            <h3 class="font-condensed text-sm font-semibold uppercase tracking-[0.28em] text-brand-600">{{ $group }}</h3>
-                            <div class="mt-6 grid gap-4 sm:grid-cols-2">
-                                @foreach ($services as $service)
-                                    <div class="card-light p-5">
-                                        <h4 class="text-base font-semibold text-slate-900">{{ $service['title'] }}</h4>
-                                        <p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $service['description'] }}</p>
-                                    </div>
-                                @endforeach
+                <div class="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($settings->services as $service)
+                        <div class="card-light flex items-start gap-3 p-4">
+                            <span class="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-600">
+                                <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                            </span>
+                            <div>
+                                <h4 class="font-semibold text-slate-900">{{ $service['title'] }}</h4>
+                                @if (! empty($service['description']))
+                                    <p class="mt-1 text-sm leading-relaxed text-slate-600">{{ $service['description'] }}</p>
+                                @endif
                             </div>
                         </div>
                     @endforeach

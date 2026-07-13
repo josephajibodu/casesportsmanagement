@@ -1,11 +1,11 @@
 @extends('layouts.static')
 
-@section('title', 'Coming Soon — CaSe Sports Management')
+@section('title', 'Coming Soon | CaSe Sports Management')
 
 @section('body_class', 'min-h-screen bg-[#050a12] font-sans text-white antialiased')
 
 @push('meta')
-    <meta name="description" content="CaSe Sports Management — a FIFA-licensed football agency representing players and coaches worldwide. Our new website is coming soon.">
+    <meta name="description" content="CaSe Sports Management, a FIFA-licensed football agency representing players and coaches worldwide. Our new website is coming soon.">
 @endpush
 
 @section('content')
@@ -33,7 +33,7 @@
                     </span>
                 </h1>
                 <p class="mt-6 max-w-2xl text-lg leading-relaxed text-slate-300">
-                    We are building a professional home for our agency — showcasing represented players and coaches,
+                    We are building a professional home for our agency, showcasing represented players and coaches,
                     latest news, media, and partnerships. A trusted platform for football representation.
                 </p>
             </div>
