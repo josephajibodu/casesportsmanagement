@@ -43,8 +43,8 @@
                 @if ($settings->phone)
                     <li><a href="tel:{{ preg_replace('/\s+/', '', $settings->phone) }}" class="text-mist-dim transition hover:text-white">{{ $settings->phone }}</a></li>
                 @endif
-                @if ($settings->address)
-                    <li class="text-mist-dim">{!! nl2br(e($settings->address)) !!}</li>
+                @if (! empty($settings->addressLines()))
+                    <li class="text-mist-dim">{!! implode('<br>', array_map('e', $settings->addressLines())) !!}</li>
                 @endif
             </ul>
 

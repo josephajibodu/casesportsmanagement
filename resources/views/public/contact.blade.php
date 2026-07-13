@@ -87,14 +87,14 @@
                     </span>
                 </a>
             @endif
-            @if ($settings->address)
+            @if (! empty($settings->addressLines()))
                 <div class="card-light flex items-center gap-4 p-5">
                     <span class="flex size-11 items-center justify-center rounded-full bg-brand-500/15 text-brand-300">
                         <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
                     </span>
                     <span>
                         <span class="block font-condensed text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-slate-500">Office</span>
-                        <span class="text-sm text-slate-900">{!! nl2br(e($settings->address)) !!}</span>
+                        <span class="text-sm text-slate-900">{!! implode('<br>', array_map('e', $settings->addressLines())) !!}</span>
                     </span>
                 </div>
             @endif

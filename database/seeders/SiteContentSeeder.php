@@ -72,7 +72,10 @@ class SiteContentSeeder extends Seeder
             ],
             'email' => 'info@casesportsmanagement.com',
             'phone' => '+44 20 1234 5678',
-            'address' => "Mile 2 limbe\nFako\nSWR Cameroon",
+            'address_line1' => 'Mile 2',
+            'city' => 'Limbe',
+            'province' => 'Fako, South West Region',
+            'country' => 'Cameroon',
             'social_links' => [
                 'instagram' => 'https://instagram.com/casesportsmanagement',
                 'twitter' => 'https://x.com/casesports',
@@ -237,7 +240,7 @@ class SiteContentSeeder extends Seeder
             return null;
         }
 
-        Storage::disk('public')->putFileAs('team', new File($source), $file);
+        Storage::disk(config('media.disk'))->putFileAs('team', new File($source), $file);
 
         return "team/{$file}";
     }

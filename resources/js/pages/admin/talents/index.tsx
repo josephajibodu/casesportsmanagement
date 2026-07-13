@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Star, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -30,17 +30,16 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
         <>
             <Head title="Players & Coaches" />
 
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between gap-4">
-                    <Heading title="Players & Coaches" description="Manage represented talent" />
+            <AdminPage>
+                <PageHeader title="Players & Coaches" description="Manage represented talent">
                     <Button asChild>
                         <Link href="/admin/talents/create">
                             <Plus className="size-4" /> Add profile
                         </Link>
                     </Button>
-                </div>
+                </PageHeader>
 
-                <div className="overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                             <tr>
@@ -119,7 +118,7 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

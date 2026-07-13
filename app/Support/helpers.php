@@ -20,7 +20,7 @@ if (! function_exists('media_url')) {
             return $path;
         }
 
-        return Storage::disk('public')->url($path);
+        return Storage::disk(config('media.disk'))->url($path);
     }
 }
 

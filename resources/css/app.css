@@ -17,3 +17,43 @@
         @apply bg-background text-foreground;
     }
 }
+
+@layer components {
+    /* TipTap rich-text editor content */
+    .tiptap :where(p) {
+        @apply my-2 leading-relaxed;
+    }
+
+    .tiptap :where(h2) {
+        @apply mt-5 mb-2 text-xl font-semibold;
+    }
+
+    .tiptap :where(h3) {
+        @apply mt-4 mb-2 text-lg font-semibold;
+    }
+
+    .tiptap :where(ul) {
+        @apply my-2 list-disc space-y-1 pl-5;
+    }
+
+    .tiptap :where(ol) {
+        @apply my-2 list-decimal space-y-1 pl-5;
+    }
+
+    .tiptap :where(blockquote) {
+        @apply my-3 border-l-2 border-primary/50 pl-4 text-muted-foreground italic;
+    }
+
+    .tiptap :where(a) {
+        @apply text-primary underline underline-offset-2;
+    }
+
+    .tiptap :where(strong) {
+        @apply font-semibold;
+    }
+
+    .tiptap p.is-editor-empty:first-child::before {
+        content: attr(data-placeholder);
+        @apply pointer-events-none float-left h-0 text-muted-foreground;
+    }
+}

@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Play, Plus, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -26,15 +26,14 @@ export default function MediaIndex({ items, filters }: { items: Item[]; filters:
         <>
             <Head title="Gallery" />
 
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between gap-4">
-                    <Heading title="Gallery" description="Images and videos shown on the site" />
+            <AdminPage>
+                <PageHeader title="Gallery" description="Images and videos shown on the site">
                     <Button asChild>
                         <Link href="/admin/media/create">
                             <Plus className="size-4" /> Add media
                         </Link>
                     </Button>
-                </div>
+                </PageHeader>
 
                 <div className="flex gap-2">
                     {[
@@ -88,7 +87,7 @@ export default function MediaIndex({ items, filters }: { items: Item[]; filters:
                         </div>
                     ))}
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

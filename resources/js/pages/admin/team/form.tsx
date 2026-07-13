@@ -1,10 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ImageUpload } from '@/components/admin/image-upload';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
+import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 type Member = {
@@ -50,39 +48,34 @@ export default function TeamForm({ member }: { member: Member | null }) {
         <>
             <Head title={isEdit ? `Edit ${member!.full_name}` : 'Add team member'} />
 
-            <form onSubmit={submit} className="mx-auto max-w-2xl space-y-6 p-4">
-                <Heading title={isEdit ? 'Edit team member' : 'Add team member'} />
+            <form onSubmit={submit}>
+                <AdminPage>
+                    <PageHeader title={isEdit ? 'Edit team member' : 'Add team member'} description="Shown on the About page">
+                        <Button asChild variant="ghost"><Link href="/admin/team">Cancel</Link></Button>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add member'}</Button>
+                    </PageHeader>
 
-                <div className="grid gap-5 rounded-xl border p-5">
-                    <div className="grid gap-2">
-                        <Label htmlFor="full_name">Full name</Label>
-                        <Input id="full_name" value={data.full_name} onChange={(e) => setData('full_name', e.target.value)} required />
-                        <InputError message={errors.full_name} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="title">Title / role</Label>
-                        <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} />
-                        <InputError message={errors.title} />
-                    </div>
-                    <ImageUpload label="Photo" currentUrl={member?.photo_url} error={errors.photo} onFile={(f) => setData('photo', f)} />
-                    <div className="grid gap-2">
-                        <Label htmlFor="bio">Short bio</Label>
-                        <Textarea id="bio" rows={4} value={data.bio} onChange={(e) => setData('bio', e.target.value)} />
-                        <InputError message={errors.bio} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="sort_order">Sort order</Label>
-                        <Input id="sort_order" type="number" min={0} value={data.sort_order} onChange={(e) => setData('sort_order', Number(e.target.value))} />
-                        <InputError message={errors.sort_order} />
-                    </div>
-                </div>
+                    <FormSection title="Team member" description="Name, role, photo and bio.">
+                        <Field label="Full name" htmlFor="full_name" required error={errors.full_name}>
+                            <Input id="full_name" value={data.full_name} onChange={(e) => setData('full_name', e.target.value)} required />
+                        </Field>
+                        <Field label="Title / role" htmlFor="title" error={errors.title}>
+                            <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} />
+                        </Field>
+                        <ImageUpload label="Photo" currentUrl={member?.photo_url} error={errors.photo} onFile={(f) => setData('photo', f)} />
+                        <Field label="Bio" htmlFor="bio" hint="Full bio shown in the Read more modal" error={errors.bio}>
+                            <Textarea id="bio" rows={6} value={data.bio} onChange={(e) => setData('bio', e.target.value)} />
+                        </Field>
+                        <Field label="Sort order" htmlFor="sort_order" error={errors.sort_order} className="max-w-40">
+                            <Input id="sort_order" type="number" min={0} value={data.sort_order} onChange={(e) => setData('sort_order', Number(e.target.value))} />
+                        </Field>
+                    </FormSection>
 
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add member'}</Button>
-                    <Button asChild variant="ghost">
-                        <Link href="/admin/team">Cancel</Link>
-                    </Button>
-                </div>
+                    <FormActions>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add member'}</Button>
+                        <Button asChild variant="ghost"><Link href="/admin/team">Cancel</Link></Button>
+                    </FormActions>
+                </AdminPage>
             </form>
         </>
     );

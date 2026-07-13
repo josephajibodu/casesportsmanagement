@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Button } from '@/components/ui/button';
 
 type Member = {
@@ -22,15 +22,14 @@ export default function TeamIndex({ members }: { members: Member[] }) {
         <>
             <Head title="Team" />
 
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between gap-4">
-                    <Heading title="Team" description="Agency management shown on the About page" />
+            <AdminPage>
+                <PageHeader title="Team" description="Agency management shown on the About page">
                     <Button asChild>
                         <Link href="/admin/team/create">
                             <Plus className="size-4" /> Add member
                         </Link>
                     </Button>
-                </div>
+                </PageHeader>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {members.length === 0 && (
@@ -58,7 +57,7 @@ export default function TeamIndex({ members }: { members: Member[] }) {
                         </div>
                     ))}
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

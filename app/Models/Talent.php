@@ -32,7 +32,7 @@ use Illuminate\Support\Str;
 #[Fillable([
     'type', 'full_name', 'slug', 'photo', 'position', 'nationality',
     'current_club', 'biography', 'career_history', 'video_links',
-    'gallery_images', 'is_featured', 'status', 'sort_order',
+    'video_files', 'gallery_images', 'is_featured', 'status', 'sort_order',
     'meta_title', 'meta_description',
 ])]
 class Talent extends Model
@@ -54,6 +54,7 @@ class Talent extends Model
         return [
             'career_history' => 'array',
             'video_links' => 'array',
+            'video_files' => 'array',
             'gallery_images' => 'array',
             'is_featured' => 'boolean',
         ];

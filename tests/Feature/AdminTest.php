@@ -62,6 +62,20 @@ it('creates a talent with an uploaded photo', function () {
     Storage::disk('public')->assertExists($talent->photo);
 });
 
+it('uploads highlight videos for a talent', function () {
+    actingAs($this->user)->post('/admin/talents', [
+        'type' => 'player',
+        'full_name' => 'Video Star',
+        'status' => 'published',
+        'video_uploads' => [UploadedFile::fake()->create('reel.mp4', 2048, 'video/mp4')],
+    ])->assertRedirect('/admin/talents');
+
+    $talent = Talent::firstWhere('full_name', 'Video Star');
+
+    expect($talent->video_files)->toHaveCount(1);
+    Storage::disk('public')->assertExists($talent->video_files[0]);
+});
+
 it('updates a talent', function () {
     $talent = Talent::factory()->create(['full_name' => 'Before', 'type' => 'player']);
 
@@ -170,7 +184,11 @@ it('updates site settings including json fields', function () {
     actingAs($this->user)->put('/admin/site-settings', [
         'agency_name' => 'New Name',
         'email' => 'hi@example.com',
-        'services' => [['group' => 'On the Field', 'title' => 'Rep', 'description' => 'desc'], ['group' => '', 'title' => '', 'description' => '']],
+        'address_line1' => 'Mile 2',
+        'city' => 'Limbe',
+        'province' => 'Fako',
+        'country' => 'Cameroon',
+        'services' => [['group' => '', 'title' => 'Rep', 'description' => 'desc'], ['group' => '', 'title' => '', 'description' => '']],
         'stats' => [['value' => '10+', 'label' => 'Players']],
         'social_links' => ['instagram' => 'https://insta.com/x', 'twitter' => ''],
     ])->assertRedirect('/admin/site-settings');
@@ -178,6 +196,9 @@ it('updates site settings including json fields', function () {
     $settings = SiteSetting::current();
 
     expect($settings->agency_name)->toBe('New Name')
+        ->and($settings->city)->toBe('Limbe')
+        ->and($settings->country)->toBe('Cameroon')
+        ->and($settings->formatted_address)->toBe('Mile 2, Limbe, Fako, Cameroon')
         ->and($settings->services)->toHaveCount(1) // empty row dropped
         ->and($settings->social_links)->toBe(['instagram' => 'https://insta.com/x']); // empty dropped
 });

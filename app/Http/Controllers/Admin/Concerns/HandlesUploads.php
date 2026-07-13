@@ -8,8 +8,13 @@ use Illuminate\Support\Str;
 
 trait HandlesUploads
 {
+    protected function mediaDisk(): string
+    {
+        return config('media.disk');
+    }
+
     /**
-     * Store an uploaded file on the public disk, deleting any previous local file.
+     * Store an uploaded file on the media disk, deleting any previous local file.
      * Returns the new stored path, or the existing value when no new file is provided.
      */
     protected function storeUpload(?UploadedFile $file, string $folder, ?string $existing = null): ?string
@@ -20,7 +25,7 @@ trait HandlesUploads
 
         $this->deleteUpload($existing);
 
-        return $file->store($folder, 'public');
+        return $file->store($folder, $this->mediaDisk());
     }
 
     /**
@@ -29,7 +34,7 @@ trait HandlesUploads
     protected function deleteUpload(?string $path): void
     {
         if (filled($path) && ! Str::startsWith($path, ['http://', 'https://', '//'])) {
-            Storage::disk('public')->delete($path);
+            Storage::disk($this->mediaDisk())->delete($path);
         }
     }
 }

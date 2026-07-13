@@ -78,12 +78,20 @@
                 </div>
             @endif
 
-            {{-- Highlight videos --}}
-            @if (! empty($talent->video_links))
+            {{-- Highlight videos (uploaded files + embedded links) --}}
+            @if (! empty($talent->video_files) || ! empty($talent->video_links))
                 <div>
                     <h2 class="font-serif text-2xl font-semibold text-white">Highlights</h2>
                     <div class="mt-5 grid gap-5 sm:grid-cols-2">
-                        @foreach ($talent->video_links as $video)
+                        @foreach ($talent->video_files ?? [] as $path)
+                            @php $src = media_url($path); @endphp
+                            @if ($src)
+                                <div class="aspect-video overflow-hidden rounded-2xl border border-white/10 bg-black">
+                                    <video src="{{ $src }}" controls preload="metadata" class="size-full"></video>
+                                </div>
+                            @endif
+                        @endforeach
+                        @foreach ($talent->video_links ?? [] as $video)
                             @php $embed = video_embed_url($video['url'] ?? null); @endphp
                             @if ($embed)
                                 <div>

@@ -44,6 +44,11 @@ class TalentRequest extends FormRequest
             'video_links.*.label' => ['nullable', 'string', 'max:120'],
             'video_links.*.url' => ['nullable', 'url', 'max:500'],
 
+            'existing_videos' => ['nullable', 'array'],
+            'existing_videos.*' => ['string'],
+            'video_uploads' => ['nullable', 'array'],
+            'video_uploads.*' => ['file', 'mimes:mp4,mov,webm,ogg,m4v', 'max:512000'],
+
             'existing_gallery' => ['nullable', 'array'],
             'existing_gallery.*' => ['string'],
             'gallery_uploads' => ['nullable', 'array'],

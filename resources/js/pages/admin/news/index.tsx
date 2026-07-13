@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -24,17 +24,16 @@ export default function NewsIndex({ articles }: { articles: Article[] }) {
         <>
             <Head title="News & Press" />
 
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between gap-4">
-                    <Heading title="News & Press" description="Publish agency news and announcements" />
+            <AdminPage>
+                <PageHeader title="News & Press" description="Publish agency news and announcements">
                     <Button asChild>
                         <Link href="/admin/news/create">
                             <Plus className="size-4" /> New article
                         </Link>
                     </Button>
-                </div>
+                </PageHeader>
 
-                <div className="overflow-hidden rounded-xl border">
+                <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                             <tr>
@@ -85,7 +84,7 @@ export default function NewsIndex({ articles }: { articles: Article[] }) {
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -33,8 +33,8 @@ export default function EnquiriesIndex({
         <>
             <Head title="Enquiries" />
 
-            <div className="space-y-6 p-4">
-                <Heading title="Enquiries" description="Messages submitted through the contact form" />
+            <AdminPage>
+                <PageHeader title="Enquiries" description="Messages submitted through the contact form" />
 
                 <div className="flex gap-2">
                     {[
@@ -98,7 +98,7 @@ export default function EnquiriesIndex({
                         </tbody>
                     </table>
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

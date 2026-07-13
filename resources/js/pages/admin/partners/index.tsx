@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Button } from '@/components/ui/button';
 
 type Partner = {
@@ -22,15 +22,14 @@ export default function PartnersIndex({ partners }: { partners: Partner[] }) {
         <>
             <Head title="Partners" />
 
-            <div className="space-y-6 p-4">
-                <div className="flex items-center justify-between gap-4">
-                    <Heading title="Partners" description="Display-only logos shown across the site" />
+            <AdminPage>
+                <PageHeader title="Partners" description="Display-only logos shown across the site">
                     <Button asChild>
                         <Link href="/admin/partners/create">
                             <Plus className="size-4" /> Add partner
                         </Link>
                     </Button>
-                </div>
+                </PageHeader>
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {partners.length === 0 && <p className="text-sm text-muted-foreground">No partners yet.</p>}
@@ -60,7 +59,7 @@ export default function PartnersIndex({ partners }: { partners: Partner[] }) {
                         </div>
                     ))}
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

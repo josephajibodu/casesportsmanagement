@@ -1,11 +1,10 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ImageUpload } from '@/components/admin/image-upload';
+import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { NativeSelect } from '@/components/admin/native-select';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
+import { RichTextEditor } from '@/components/admin/rich-text-editor';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 type Article = {
@@ -68,90 +67,64 @@ export default function NewsForm({ article, options }: { article: Article | null
         <>
             <Head title={isEdit ? `Edit ${article!.title}` : 'New article'} />
 
-            <form onSubmit={submit} className="mx-auto max-w-3xl space-y-8 p-4">
-                <Heading title={isEdit ? 'Edit article' : 'New article'} description="Attributed to the agency — no author byline" />
+            <form onSubmit={submit}>
+                <AdminPage>
+                    <PageHeader
+                        title={isEdit ? 'Edit article' : 'New article'}
+                        description="Attributed to the agency, no author byline"
+                    >
+                        <Button asChild variant="ghost"><Link href="/admin/news">Cancel</Link></Button>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Create article'}</Button>
+                    </PageHeader>
 
-                <div className="grid gap-5 rounded-xl border p-5">
-                    <div className="grid gap-2">
-                        <Label htmlFor="title">Title</Label>
-                        <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} required />
-                        <InputError message={errors.title} />
+                    <div className="space-y-10">
+                        <FormSection title="Article" description="Headline, image and content.">
+                            <Field label="Title" htmlFor="title" required error={errors.title}>
+                                <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} required />
+                            </Field>
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                <Field label="Category" htmlFor="category" error={errors.category}>
+                                    <NativeSelect id="category" value={data.category} onChange={(e) => setData('category', e.target.value)}>
+                                        <option value="">— None —</option>
+                                        {options.categories.map((c) => (<option key={c} value={c}>{c}</option>))}
+                                    </NativeSelect>
+                                </Field>
+                                <Field label="Status" htmlFor="status" error={errors.status}>
+                                    <NativeSelect id="status" value={data.status} onChange={(e) => setData('status', e.target.value)}>
+                                        {options.statuses.map((s) => (<option key={s} value={s}>{s}</option>))}
+                                    </NativeSelect>
+                                </Field>
+                            </div>
+                            <Field label="Publish date" htmlFor="published_at" hint="Leave blank to auto-set when published" error={errors.published_at}>
+                                <Input id="published_at" type="datetime-local" value={data.published_at} onChange={(e) => setData('published_at', e.target.value)} />
+                            </Field>
+                            <ImageUpload label="Featured image" currentUrl={article?.image_url} error={errors.featured_image} onFile={(f) => setData('featured_image', f)} />
+                            <Field label="Excerpt" htmlFor="excerpt" error={errors.excerpt}>
+                                <Textarea id="excerpt" rows={2} value={data.excerpt} onChange={(e) => setData('excerpt', e.target.value)} />
+                            </Field>
+                            <Field label="Body" error={errors.body}>
+                                <RichTextEditor value={data.body} onChange={(html) => setData('body', html)} placeholder="Write the article…" />
+                            </Field>
+                        </FormSection>
+
+                        <FormSection title="SEO" description="Search and social metadata.">
+                            <Field label="Slug" htmlFor="slug" hint="Leave blank to auto-generate" error={errors.slug}>
+                                <Input id="slug" value={data.slug} onChange={(e) => setData('slug', e.target.value)} placeholder="auto-generated" />
+                            </Field>
+                            <Field label="Meta title" htmlFor="meta_title" error={errors.meta_title}>
+                                <Input id="meta_title" value={data.meta_title} onChange={(e) => setData('meta_title', e.target.value)} />
+                            </Field>
+                            <Field label="Meta description" htmlFor="meta_description" error={errors.meta_description}>
+                                <Textarea id="meta_description" rows={2} value={data.meta_description} onChange={(e) => setData('meta_description', e.target.value)} />
+                            </Field>
+                        </FormSection>
                     </div>
 
-                    <div className="grid gap-2 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="category">Category</Label>
-                            <NativeSelect id="category" value={data.category} onChange={(e) => setData('category', e.target.value)}>
-                                <option value="">— None —</option>
-                                {options.categories.map((c) => (
-                                    <option key={c} value={c}>{c}</option>
-                                ))}
-                            </NativeSelect>
-                            <InputError message={errors.category} />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="status">Status</Label>
-                            <NativeSelect id="status" value={data.status} onChange={(e) => setData('status', e.target.value)}>
-                                {options.statuses.map((s) => (
-                                    <option key={s} value={s}>{s}</option>
-                                ))}
-                            </NativeSelect>
-                            <InputError message={errors.status} />
-                        </div>
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="published_at">Publish date</Label>
-                        <Input id="published_at" type="datetime-local" value={data.published_at} onChange={(e) => setData('published_at', e.target.value)} />
-                        <p className="text-xs text-muted-foreground">Leave blank to auto-set when published.</p>
-                        <InputError message={errors.published_at} />
-                    </div>
-
-                    <ImageUpload
-                        label="Featured image"
-                        currentUrl={article?.image_url}
-                        error={errors.featured_image}
-                        onFile={(f) => setData('featured_image', f)}
-                    />
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="excerpt">Excerpt</Label>
-                        <Textarea id="excerpt" rows={2} value={data.excerpt} onChange={(e) => setData('excerpt', e.target.value)} />
-                        <InputError message={errors.excerpt} />
-                    </div>
-
-                    <div className="grid gap-2">
-                        <Label htmlFor="body">Body</Label>
-                        <Textarea id="body" rows={12} value={data.body} onChange={(e) => setData('body', e.target.value)} />
-                        <p className="text-xs text-muted-foreground">Basic HTML is supported (e.g. &lt;p&gt;, &lt;strong&gt;).</p>
-                        <InputError message={errors.body} />
-                    </div>
-                </div>
-
-                <div className="grid gap-5 rounded-xl border p-5">
-                    <div className="grid gap-2">
-                        <Label htmlFor="slug">Slug (optional)</Label>
-                        <Input id="slug" value={data.slug} onChange={(e) => setData('slug', e.target.value)} placeholder="auto-generated" />
-                        <InputError message={errors.slug} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="meta_title">Meta title (SEO)</Label>
-                        <Input id="meta_title" value={data.meta_title} onChange={(e) => setData('meta_title', e.target.value)} />
-                        <InputError message={errors.meta_title} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="meta_description">Meta description (SEO)</Label>
-                        <Textarea id="meta_description" rows={2} value={data.meta_description} onChange={(e) => setData('meta_description', e.target.value)} />
-                        <InputError message={errors.meta_description} />
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Create article'}</Button>
-                    <Button asChild variant="ghost">
-                        <Link href="/admin/news">Cancel</Link>
-                    </Button>
-                </div>
+                    <FormActions>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Create article'}</Button>
+                        <Button asChild variant="ghost"><Link href="/admin/news">Cancel</Link></Button>
+                    </FormActions>
+                </AdminPage>
             </form>
         </>
     );

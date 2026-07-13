@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import Heading from '@/components/heading';
+import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { Badge } from '@/components/ui/badge';
 
 type Stats = {
@@ -44,15 +44,15 @@ export default function AdminDashboard({
         <>
             <Head title="Dashboard" />
 
-            <div className="space-y-6 p-4">
-                <Heading title="Dashboard" description="Overview of your website content" />
+            <AdminPage>
+                <PageHeader title="Dashboard" description="Overview of your website content" />
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                     {cards.map((card) => (
                         <Link
                             key={card.label}
                             href={card.href}
-                            className="rounded-xl border p-4 transition hover:border-primary/40 hover:bg-accent/40"
+                            className="rounded-xl border bg-card p-5 shadow-sm transition hover:border-primary/40 hover:bg-accent/40"
                         >
                             <div className="text-3xl font-semibold">{stats[card.key]}</div>
                             <div className="mt-1 text-sm text-muted-foreground">{card.label}</div>
@@ -60,7 +60,7 @@ export default function AdminDashboard({
                     ))}
                 </div>
 
-                <div className="rounded-xl border">
+                <div className="mt-6 rounded-xl border bg-card shadow-sm">
                     <div className="flex items-center justify-between border-b p-4">
                         <div className="flex items-center gap-2">
                             <h2 className="text-sm font-semibold">Recent enquiries</h2>
@@ -99,7 +99,7 @@ export default function AdminDashboard({
                         </ul>
                     )}
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

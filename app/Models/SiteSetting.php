@@ -17,13 +17,18 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<int, array{value: string, label: string}>|null $stats
  * @property string|null $email
  * @property string|null $phone
- * @property string|null $address
+ * @property string|null $address_line1
+ * @property string|null $address_line2
+ * @property string|null $city
+ * @property string|null $province
+ * @property string|null $country
  * @property array<string, string>|null $social_links
  */
 #[Fillable([
     'agency_name', 'tagline', 'agency_story', 'mission', 'vision',
     'fifa_license_info', 'services', 'stats', 'email', 'phone',
-    'address', 'social_links',
+    'address_line1', 'address_line2', 'city', 'province', 'country',
+    'social_links',
 ])]
 class SiteSetting extends Model
 {
@@ -37,6 +42,29 @@ class SiteSetting extends Model
             'stats' => 'array',
             'social_links' => 'array',
         ];
+    }
+
+    /**
+     * The address as an ordered list of non-empty lines.
+     *
+     * @return array<int, string>
+     */
+    public function addressLines(): array
+    {
+        return array_values(array_filter([
+            $this->address_line1,
+            $this->address_line2,
+            trim(implode(', ', array_filter([$this->city, $this->province]))),
+            $this->country,
+        ], fn ($line) => filled($line)));
+    }
+
+    /**
+     * The full address on a single line.
+     */
+    public function getFormattedAddressAttribute(): string
+    {
+        return implode(', ', $this->addressLines());
     }
 
     /**

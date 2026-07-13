@@ -1,5 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
+import { AdminPage } from '@/components/admin/layout';
 import Heading from '@/components/heading';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,7 @@ export default function EnquiryShow({ submission }: { submission: Submission }) 
         <>
             <Head title={`Enquiry from ${submission.name}`} />
 
-            <div className="mx-auto max-w-2xl space-y-6 p-4">
+            <AdminPage className="max-w-3xl space-y-6">
                 <Link href="/admin/enquiries" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
                     <ArrowLeft className="size-4" /> Back to enquiries
                 </Link>
@@ -81,7 +82,7 @@ export default function EnquiryShow({ submission }: { submission: Submission }) 
                         <Trash2 className="size-4 text-destructive" /> Delete
                     </Button>
                 </div>
-            </div>
+            </AdminPage>
         </>
     );
 }

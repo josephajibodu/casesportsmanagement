@@ -75,6 +75,7 @@ class TalentController extends Controller
                 'biography' => $talent->biography,
                 'career_history' => $talent->career_history ?? [],
                 'video_links' => $talent->video_links ?? [],
+                'videos' => collect($talent->video_files ?? [])->map(fn ($p) => ['path' => $p, 'url' => media_url($p)])->values(),
                 'gallery' => collect($talent->gallery_images ?? [])->map(fn ($p) => ['path' => $p, 'url' => media_url($p)])->values(),
                 'is_featured' => $talent->is_featured,
                 'status' => $talent->status,
@@ -100,7 +101,7 @@ class TalentController extends Controller
     public function destroy(Talent $talent): RedirectResponse
     {
         $this->deleteUpload($talent->photo);
-        foreach ($talent->gallery_images ?? [] as $path) {
+        foreach (array_merge($talent->gallery_images ?? [], $talent->video_files ?? []) as $path) {
             $this->deleteUpload($path);
         }
         $talent->delete();
@@ -121,32 +122,47 @@ class TalentController extends Controller
 
     protected function fill(Talent $talent, TalentRequest $request): void
     {
-        $data = $request->safe()->except(['photo', 'gallery_uploads', 'existing_gallery']);
+        $data = $request->safe()->except([
+            'photo', 'gallery_uploads', 'existing_gallery', 'video_uploads', 'existing_videos',
+        ]);
 
         $data['career_history'] = $this->cleanRows($request->input('career_history'), ['club', 'years']);
         $data['video_links'] = $this->cleanRows($request->input('video_links'), ['label', 'url']);
         $data['photo'] = $this->storeUpload($request->file('photo'), 'talents', $talent->photo);
-        $data['gallery_images'] = $this->buildGallery($request, $talent);
+        $data['gallery_images'] = $this->buildStoredList(
+            $request, $talent, 'existing_gallery', 'gallery_uploads', 'talents/gallery', $talent->gallery_images ?? []
+        );
+        $data['video_files'] = $this->buildStoredList(
+            $request, $talent, 'existing_videos', 'video_uploads', 'talents/videos', $talent->video_files ?? []
+        );
 
         $talent->fill($data);
     }
 
     /**
+     * Merge kept existing paths with newly uploaded files, deleting anything removed.
+     *
+     * @param  array<int, string>  $existingPaths
      * @return array<int, string>
      */
-    protected function buildGallery(TalentRequest $request, Talent $talent): array
-    {
-        $kept = collect($request->input('existing_gallery', []))->filter()->values();
+    protected function buildStoredList(
+        TalentRequest $request,
+        Talent $talent,
+        string $keepKey,
+        string $uploadKey,
+        string $folder,
+        array $existingPaths,
+    ): array {
+        $kept = collect($request->input($keepKey, []))->filter()->values();
 
-        // Delete any previously-stored gallery images the user removed.
-        foreach ($talent->gallery_images ?? [] as $path) {
+        foreach ($existingPaths as $path) {
             if (! $kept->contains($path)) {
                 $this->deleteUpload($path);
             }
         }
 
-        $uploaded = collect($request->file('gallery_uploads', []))
-            ->map(fn ($file) => $file->store('talents/gallery', 'public'));
+        $uploaded = collect($request->file($uploadKey, []))
+            ->map(fn ($file) => $file->store($folder, $this->mediaDisk()));
 
         return $kept->merge($uploaded)->values()->all();
     }

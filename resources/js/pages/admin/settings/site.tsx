@@ -1,10 +1,8 @@
 import { Head, useForm } from '@inertiajs/react';
+import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { Repeater } from '@/components/admin/repeater';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 type Row = Record<string, string>;
@@ -18,7 +16,11 @@ type Settings = {
     fifa_license_info: string | null;
     email: string | null;
     phone: string | null;
-    address: string | null;
+    address_line1: string | null;
+    address_line2: string | null;
+    city: string | null;
+    province: string | null;
+    country: string | null;
     services: Row[];
     stats: Row[];
     social_links: Record<string, string>;
@@ -40,7 +42,11 @@ export default function SiteSettings({
         fifa_license_info: string;
         email: string;
         phone: string;
-        address: string;
+        address_line1: string;
+        address_line2: string;
+        city: string;
+        province: string;
+        country: string;
         services: Row[];
         stats: Row[];
         social_links: Record<string, string>;
@@ -53,7 +59,11 @@ export default function SiteSettings({
         fifa_license_info: settings.fifa_license_info ?? '',
         email: settings.email ?? '',
         phone: settings.phone ?? '',
-        address: settings.address ?? '',
+        address_line1: settings.address_line1 ?? '',
+        address_line2: settings.address_line2 ?? '',
+        city: settings.city ?? '',
+        province: settings.province ?? '',
+        country: settings.country ?? '',
         services: settings.services ?? [],
         stats: settings.stats ?? [],
         social_links: socialKeys.reduce<Record<string, string>>((acc, key) => {
@@ -73,110 +83,106 @@ export default function SiteSettings({
         <>
             <Head title="Site Settings" />
 
-            <form onSubmit={submit} className="mx-auto max-w-3xl space-y-8 p-4">
-                <Heading title="Site Settings" description="Content shared across the public website" />
+            <form onSubmit={submit}>
+                <AdminPage>
+                    <PageHeader title="Site Settings" description="Content shared across the public website">
+                        <Button type="submit" disabled={processing}>Save settings</Button>
+                    </PageHeader>
 
-                {/* Identity */}
-                <section className="grid gap-5 rounded-xl border p-5">
-                    <h2 className="text-sm font-semibold">Agency</h2>
-                    <div className="grid gap-2">
-                        <Label htmlFor="agency_name">Agency name</Label>
-                        <Input id="agency_name" value={data.agency_name} onChange={(e) => setData('agency_name', e.target.value)} required />
-                        <InputError message={errors.agency_name} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="tagline">Tagline</Label>
-                        <Input id="tagline" value={data.tagline} onChange={(e) => setData('tagline', e.target.value)} />
-                        <InputError message={errors.tagline} />
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="agency_story">Agency story</Label>
-                        <Textarea id="agency_story" rows={6} value={data.agency_story} onChange={(e) => setData('agency_story', e.target.value)} />
-                        <InputError message={errors.agency_story} />
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="mission">Mission</Label>
-                            <Textarea id="mission" rows={3} value={data.mission} onChange={(e) => setData('mission', e.target.value)} />
-                            <InputError message={errors.mission} />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="vision">Vision</Label>
-                            <Textarea id="vision" rows={3} value={data.vision} onChange={(e) => setData('vision', e.target.value)} />
-                            <InputError message={errors.vision} />
-                        </div>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="fifa_license_info">FIFA licence info</Label>
-                        <Input id="fifa_license_info" value={data.fifa_license_info} onChange={(e) => setData('fifa_license_info', e.target.value)} />
-                        <InputError message={errors.fifa_license_info} />
-                    </div>
-                </section>
-
-                {/* Contact */}
-                <section className="grid gap-5 rounded-xl border p-5">
-                    <h2 className="text-sm font-semibold">Contact</h2>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="email">Email</Label>
-                            <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
-                            <InputError message={errors.email} />
-                        </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="phone">Phone</Label>
-                            <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
-                            <InputError message={errors.phone} />
-                        </div>
-                    </div>
-                    <div className="grid gap-2">
-                        <Label htmlFor="address">Office address</Label>
-                        <Textarea id="address" rows={2} value={data.address} onChange={(e) => setData('address', e.target.value)} />
-                        <InputError message={errors.address} />
-                    </div>
-                    <div className="grid gap-4 sm:grid-cols-2">
-                        {socialKeys.map((key) => (
-                            <div key={key} className="grid gap-2">
-                                <Label htmlFor={`social_${key}`} className="capitalize">{key}</Label>
-                                <Input
-                                    id={`social_${key}`}
-                                    value={data.social_links[key] ?? ''}
-                                    onChange={(e) => setData('social_links', { ...data.social_links, [key]: e.target.value })}
-                                    placeholder="https://"
-                                />
+                    <div className="space-y-10">
+                        <FormSection title="Agency" description="Your identity and story shown across the site.">
+                            <Field label="Agency name" htmlFor="agency_name" required error={errors.agency_name}>
+                                <Input id="agency_name" value={data.agency_name} onChange={(e) => setData('agency_name', e.target.value)} required />
+                            </Field>
+                            <Field label="Tagline" htmlFor="tagline" error={errors.tagline}>
+                                <Input id="tagline" value={data.tagline} onChange={(e) => setData('tagline', e.target.value)} />
+                            </Field>
+                            <Field label="Agency story" htmlFor="agency_story" error={errors.agency_story}>
+                                <Textarea id="agency_story" rows={6} value={data.agency_story} onChange={(e) => setData('agency_story', e.target.value)} />
+                            </Field>
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                <Field label="Mission" htmlFor="mission" error={errors.mission}>
+                                    <Textarea id="mission" rows={3} value={data.mission} onChange={(e) => setData('mission', e.target.value)} />
+                                </Field>
+                                <Field label="Vision" htmlFor="vision" error={errors.vision}>
+                                    <Textarea id="vision" rows={3} value={data.vision} onChange={(e) => setData('vision', e.target.value)} />
+                                </Field>
                             </div>
-                        ))}
+                            <Field label="FIFA licence info" htmlFor="fifa_license_info" error={errors.fifa_license_info}>
+                                <Input id="fifa_license_info" value={data.fifa_license_info} onChange={(e) => setData('fifa_license_info', e.target.value)} />
+                            </Field>
+                        </FormSection>
+
+                        <FormSection title="Contact" description="How visitors reach the agency.">
+                            <div className="grid gap-5 sm:grid-cols-2">
+                                <Field label="Email" htmlFor="email" error={errors.email}>
+                                    <Input id="email" type="email" value={data.email} onChange={(e) => setData('email', e.target.value)} />
+                                </Field>
+                                <Field label="Phone" htmlFor="phone" error={errors.phone}>
+                                    <Input id="phone" value={data.phone} onChange={(e) => setData('phone', e.target.value)} />
+                                </Field>
+                            </div>
+
+                            <Field label="Address line 1" htmlFor="address_line1" error={errors.address_line1}>
+                                <Input id="address_line1" value={data.address_line1} onChange={(e) => setData('address_line1', e.target.value)} />
+                            </Field>
+                            <Field label="Address line 2" htmlFor="address_line2" hint="Optional" error={errors.address_line2}>
+                                <Input id="address_line2" value={data.address_line2} onChange={(e) => setData('address_line2', e.target.value)} />
+                            </Field>
+                            <div className="grid gap-5 sm:grid-cols-3">
+                                <Field label="City" htmlFor="city" error={errors.city}>
+                                    <Input id="city" value={data.city} onChange={(e) => setData('city', e.target.value)} />
+                                </Field>
+                                <Field label="Province / State" htmlFor="province" error={errors.province}>
+                                    <Input id="province" value={data.province} onChange={(e) => setData('province', e.target.value)} />
+                                </Field>
+                                <Field label="Country" htmlFor="country" error={errors.country}>
+                                    <Input id="country" value={data.country} onChange={(e) => setData('country', e.target.value)} />
+                                </Field>
+                            </div>
+
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {socialKeys.map((key) => (
+                                    <Field key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} htmlFor={`social_${key}`}>
+                                        <Input
+                                            id={`social_${key}`}
+                                            value={data.social_links[key] ?? ''}
+                                            onChange={(e) => setData('social_links', { ...data.social_links, [key]: e.target.value })}
+                                            placeholder="https://"
+                                        />
+                                    </Field>
+                                ))}
+                            </div>
+                        </FormSection>
+
+                        <FormSection title="Homepage" description="Services and stats shown on the homepage.">
+                            <Repeater
+                                label="Services"
+                                rows={data.services}
+                                onChange={(rows) => setData('services', rows)}
+                                fields={[
+                                    { key: 'title', placeholder: 'Title' },
+                                    { key: 'description', placeholder: 'Description' },
+                                ]}
+                                addLabel="Add service"
+                            />
+                            <Repeater
+                                label="Stats"
+                                rows={data.stats}
+                                onChange={(rows) => setData('stats', rows)}
+                                fields={[
+                                    { key: 'value', placeholder: 'Value (e.g. 20+)' },
+                                    { key: 'label', placeholder: 'Label (e.g. Players)' },
+                                ]}
+                                addLabel="Add stat"
+                            />
+                        </FormSection>
                     </div>
-                </section>
 
-                {/* Services + stats */}
-                <section className="grid gap-6 rounded-xl border p-5">
-                    <h2 className="text-sm font-semibold">Homepage content</h2>
-                    <Repeater
-                        label="Services"
-                        rows={data.services}
-                        onChange={(rows) => setData('services', rows)}
-                        fields={[
-                            { key: 'group', placeholder: 'Group (e.g. On the Field)' },
-                            { key: 'title', placeholder: 'Title' },
-                            { key: 'description', placeholder: 'Description' },
-                        ]}
-                        addLabel="Add service"
-                    />
-                    <Repeater
-                        label="Stats"
-                        rows={data.stats}
-                        onChange={(rows) => setData('stats', rows)}
-                        fields={[
-                            { key: 'value', placeholder: 'Value (e.g. 20+)' },
-                            { key: 'label', placeholder: 'Label (e.g. Players)' },
-                        ]}
-                        addLabel="Add stat"
-                    />
-                </section>
-
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>Save settings</Button>
-                </div>
+                    <FormActions>
+                        <Button type="submit" disabled={processing}>Save settings</Button>
+                    </FormActions>
+                </AdminPage>
             </form>
         </>
     );

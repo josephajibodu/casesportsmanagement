@@ -1,11 +1,9 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ImageUpload } from '@/components/admin/image-upload';
+import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { NativeSelect } from '@/components/admin/native-select';
-import Heading from '@/components/heading';
-import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 type Item = {
     id: number;
@@ -65,77 +63,58 @@ export default function MediaForm({ item, options }: { item: Item | null; option
         <>
             <Head title={isEdit ? 'Edit media' : 'Add media'} />
 
-            <form onSubmit={submit} className="mx-auto max-w-2xl space-y-6 p-4">
-                <Heading title={isEdit ? 'Edit media' : 'Add media'} />
+            <form onSubmit={submit}>
+                <AdminPage>
+                    <PageHeader title={isEdit ? 'Edit media' : 'Add media'} description="Images and videos shown in the gallery">
+                        <Button asChild variant="ghost"><Link href="/admin/media">Cancel</Link></Button>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add media'}</Button>
+                    </PageHeader>
 
-                <div className="grid gap-5 rounded-xl border p-5">
-                    <div className="grid gap-2 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="media_type">Type</Label>
-                            <NativeSelect
-                                id="media_type"
-                                value={data.media_type}
-                                onChange={(e) => setData((prev) => ({ ...prev, media_type: e.target.value, category: '' }))}
-                            >
-                                {options.types.map((t) => (
-                                    <option key={t} value={t} className="capitalize">{t}</option>
-                                ))}
-                            </NativeSelect>
-                            <InputError message={errors.media_type} />
+                    <FormSection title="Media" description="Upload an image or link a video.">
+                        <div className="grid gap-5 sm:grid-cols-2">
+                            <Field label="Type" htmlFor="media_type" error={errors.media_type}>
+                                <NativeSelect id="media_type" value={data.media_type} onChange={(e) => setData((prev) => ({ ...prev, media_type: e.target.value, category: '' }))}>
+                                    {options.types.map((t) => (<option key={t} value={t} className="capitalize">{t}</option>))}
+                                </NativeSelect>
+                            </Field>
+                            <Field label="Category" htmlFor="category" error={errors.category}>
+                                <NativeSelect id="category" value={data.category} onChange={(e) => setData('category', e.target.value)}>
+                                    <option value="">— None —</option>
+                                    {categories.map((c) => (<option key={c} value={c}>{c}</option>))}
+                                </NativeSelect>
+                            </Field>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="category">Category</Label>
-                            <NativeSelect id="category" value={data.category} onChange={(e) => setData('category', e.target.value)}>
-                                <option value="">— None —</option>
-                                {categories.map((c) => (
-                                    <option key={c} value={c}>{c}</option>
-                                ))}
-                            </NativeSelect>
-                            <InputError message={errors.category} />
-                        </div>
-                    </div>
 
-                    {data.media_type === 'image' ? (
-                        <ImageUpload label="Image" currentUrl={item?.image_url} error={errors.image} onFile={(f) => setData('image', f)} />
-                    ) : (
-                        <div className="grid gap-2">
-                            <Label htmlFor="video_url">Video URL (YouTube / Vimeo)</Label>
-                            <Input id="video_url" value={data.video_url} onChange={(e) => setData('video_url', e.target.value)} placeholder="https://youtube.com/watch?v=..." />
-                            <InputError message={errors.video_url} />
-                        </div>
-                    )}
+                        {data.media_type === 'image' ? (
+                            <ImageUpload label="Image" currentUrl={item?.image_url} error={errors.image} onFile={(f) => setData('image', f)} />
+                        ) : (
+                            <Field label="Video URL (YouTube / Vimeo)" htmlFor="video_url" error={errors.video_url}>
+                                <Input id="video_url" value={data.video_url} onChange={(e) => setData('video_url', e.target.value)} placeholder="https://youtube.com/watch?v=..." />
+                            </Field>
+                        )}
 
-                    <div className="grid gap-2">
-                        <Label htmlFor="caption">Caption</Label>
-                        <Input id="caption" value={data.caption} onChange={(e) => setData('caption', e.target.value)} />
-                        <InputError message={errors.caption} />
-                    </div>
+                        <Field label="Caption" htmlFor="caption" error={errors.caption}>
+                            <Input id="caption" value={data.caption} onChange={(e) => setData('caption', e.target.value)} />
+                        </Field>
 
-                    <div className="grid gap-2 sm:grid-cols-2">
-                        <div className="grid gap-2">
-                            <Label htmlFor="talent_id">Linked player / coach (optional)</Label>
-                            <NativeSelect id="talent_id" value={data.talent_id} onChange={(e) => setData('talent_id', e.target.value)}>
-                                <option value="">— None —</option>
-                                {options.talents.map((t) => (
-                                    <option key={t.id} value={t.id}>{t.name}</option>
-                                ))}
-                            </NativeSelect>
-                            <InputError message={errors.talent_id} />
+                        <div className="grid gap-5 sm:grid-cols-2">
+                            <Field label="Linked player / coach" htmlFor="talent_id" hint="Optional" error={errors.talent_id}>
+                                <NativeSelect id="talent_id" value={data.talent_id} onChange={(e) => setData('talent_id', e.target.value)}>
+                                    <option value="">— None —</option>
+                                    {options.talents.map((t) => (<option key={t.id} value={t.id}>{t.name}</option>))}
+                                </NativeSelect>
+                            </Field>
+                            <Field label="Sort order" htmlFor="sort_order" error={errors.sort_order}>
+                                <Input id="sort_order" type="number" min={0} value={data.sort_order} onChange={(e) => setData('sort_order', Number(e.target.value))} />
+                            </Field>
                         </div>
-                        <div className="grid gap-2">
-                            <Label htmlFor="sort_order">Sort order</Label>
-                            <Input id="sort_order" type="number" min={0} value={data.sort_order} onChange={(e) => setData('sort_order', Number(e.target.value))} />
-                            <InputError message={errors.sort_order} />
-                        </div>
-                    </div>
-                </div>
+                    </FormSection>
 
-                <div className="flex items-center gap-3">
-                    <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add media'}</Button>
-                    <Button asChild variant="ghost">
-                        <Link href="/admin/media">Cancel</Link>
-                    </Button>
-                </div>
+                    <FormActions>
+                        <Button type="submit" disabled={processing}>{isEdit ? 'Save changes' : 'Add media'}</Button>
+                        <Button asChild variant="ghost"><Link href="/admin/media">Cancel</Link></Button>
+                    </FormActions>
+                </AdminPage>
             </form>
         </>
     );
