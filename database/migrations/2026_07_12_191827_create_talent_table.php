@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('talents', function (Blueprint $table) {
             $table->id();
-            $table->string('type')->default('player'); // player | coach
+            $table->string('type', 20)->default('player'); // player | coach
             $table->string('full_name');
             $table->string('slug')->unique();
             $table->string('photo')->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
             $table->json('video_links')->nullable();    // [{label, url}]
             $table->json('gallery_images')->nullable();  // [path]
             $table->boolean('is_featured')->default(false);
-            $table->string('status')->default('draft'); // draft | published
+            $table->string('status', 20)->default('draft'); // draft | published
             $table->unsignedInteger('sort_order')->default(0);
             $table->string('meta_title')->nullable();
             $table->string('meta_description', 500)->nullable();

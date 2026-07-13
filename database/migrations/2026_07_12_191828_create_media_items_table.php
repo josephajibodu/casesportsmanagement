@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('media_items', function (Blueprint $table) {
             $table->id();
-            $table->string('media_type')->default('image'); // image | video
-            $table->string('category')->nullable(); // Events, Matches, Interviews, Highlights...
+            $table->string('media_type', 20)->default('image'); // image | video
+            $table->string('category', 120)->nullable(); // Events, Matches, Interviews, Highlights...
             $table->string('image_path')->nullable(); // for images
             $table->string('video_url')->nullable();  // for video embeds (YouTube/Vimeo)
             $table->string('caption')->nullable();

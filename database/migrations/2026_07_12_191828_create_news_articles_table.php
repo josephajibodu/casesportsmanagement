@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('excerpt', 500)->nullable();
             $table->longText('body')->nullable();
             $table->string('featured_image')->nullable();
-            $table->string('category')->nullable(); // Player Updates | Agency Announcements | Press Mentions | Football Updates
+            $table->string('category', 50)->nullable(); // Player Updates | Agency Announcements | Press Mentions | Football Updates
             $table->timestamp('published_at')->nullable();
-            $table->string('status')->default('draft'); // draft | published
+            $table->string('status', 20)->default('draft'); // draft | published
             $table->string('meta_title')->nullable();
             $table->string('meta_description', 500)->nullable();
             $table->timestamps();
