@@ -70,7 +70,10 @@ export function FileManagerModal({
                 }
             }}
         >
-            <DialogContent className="flex h-[85vh] max-w-6xl flex-col gap-0 p-0">
+            {/* The sm:* variant matters: DialogContent ships `sm:max-w-lg`, which
+                a plain `max-w-*` cannot override (different variant, so
+                tailwind-merge keeps both and the sm: rule wins). */}
+            <DialogContent className="flex h-[85vh] w-[95vw] flex-col gap-0 p-0 sm:max-w-6xl">
                 <DialogHeader className="border-b px-6 py-4">
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
@@ -97,7 +100,9 @@ export function FileManagerModal({
                     ))}
                 </div>
 
-                <div className="min-h-0 flex-1 overflow-y-auto p-6">
+                {/* Only the file area scrolls, so the toolbar, sidebar and
+                    breadcrumbs stay put like a desktop file manager. */}
+                <div className="min-h-0 flex-1 overflow-hidden p-6">
                     {tab === 'browse' ? (
                         <FileManager
                             fm={fm}
@@ -106,18 +111,21 @@ export function FileManagerModal({
                             onFileClick={toggle}
                             onUploadRequest={() => setTab('upload')}
                             className="h-full"
+                            contentClassName="overflow-y-auto pr-1"
                         />
                     ) : (
-                        <UploadPanel
-                            folderId={fm.folderId}
-                            accept={accept}
-                            onUploaded={(file) => {
-                                // New uploads appear in the browser and are pre-selected.
-                                fm.addUploadedFile(file);
-                                fm.refresh();
-                                setSelected((prev) => (multiple ? [...prev, file] : [file]));
-                            }}
-                        />
+                        <div className="h-full overflow-y-auto">
+                            <UploadPanel
+                                folderId={fm.folderId}
+                                accept={accept}
+                                onUploaded={(file) => {
+                                    // New uploads appear in the browser and are pre-selected.
+                                    fm.addUploadedFile(file);
+                                    fm.refresh();
+                                    setSelected((prev) => (multiple ? [...prev, file] : [file]));
+                                }}
+                            />
+                        </div>
                     )}
                 </div>
 

@@ -139,22 +139,19 @@ export function FileManager({
                     }}
                     onDrop={handleDrop}
                     className={cn(
-                        'relative min-w-0 flex-1 rounded-xl transition',
+                        'relative flex min-w-0 flex-1 flex-col gap-3 rounded-xl transition',
                         dragging && 'ring-2 ring-primary ring-offset-2',
-                        contentClassName,
                     )}
                 >
                     {!fm.typeFilter && (
-                        <div className="mb-3">
-                            <Breadcrumbs
-                                trail={fm.breadcrumbs}
-                                onNavigate={fm.openFolder}
-                                onDropFile={(fileId, folderId) => {
-                                    const file = fm.files.find((f) => f.id === fileId);
-                                    if (file) fm.moveFile(file, folderId);
-                                }}
-                            />
-                        </div>
+                        <Breadcrumbs
+                            trail={fm.breadcrumbs}
+                            onNavigate={fm.openFolder}
+                            onDropFile={(fileId, folderId) => {
+                                const file = fm.files.find((f) => f.id === fileId);
+                                if (file) fm.moveFile(file, folderId);
+                            }}
+                        />
                     )}
 
                     {dragging && (
@@ -165,26 +162,31 @@ export function FileManager({
                         </div>
                     )}
 
-                    {isEmpty ? (
-                        <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed text-center">
-                            <FolderOpen className="size-10 text-muted-foreground/50" />
-                            <p className="mt-3 text-sm font-medium">
-                                {fm.search ? 'No matching files' : 'This folder is empty'}
-                            </p>
-                            <p className="mt-1 text-sm text-muted-foreground">
-                                {fm.search ? 'Try a different search.' : 'Drop files here or use the Upload button.'}
-                            </p>
-                            {!fm.search && (
-                                <Button size="sm" className="mt-4" onClick={handleUploadClick}>
-                                    <Upload className="size-4" /> Upload files
-                                </Button>
-                            )}
-                        </div>
-                    ) : fm.view === 'grid' ? (
-                        <FileGrid {...browserProps} />
-                    ) : (
-                        <FileList {...browserProps} sort={fm.sort} direction={fm.direction} onToggleSort={fm.toggleSort} />
-                    )}
+                    {/* @container: the grids size their columns off this element's
+                        width rather than the viewport's, so they stay correct in
+                        both the full-width page and the narrower picker modal. */}
+                    <div className={cn('@container min-h-0 flex-1', contentClassName)}>
+                        {isEmpty ? (
+                            <div className="flex h-full min-h-64 flex-col items-center justify-center rounded-xl border border-dashed text-center">
+                                <FolderOpen className="size-10 text-muted-foreground/50" />
+                                <p className="mt-3 text-sm font-medium">
+                                    {fm.search ? 'No matching files' : 'This folder is empty'}
+                                </p>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    {fm.search ? 'Try a different search.' : 'Drop files here or use the Upload button.'}
+                                </p>
+                                {!fm.search && (
+                                    <Button size="sm" className="mt-4" onClick={handleUploadClick}>
+                                        <Upload className="size-4" /> Upload files
+                                    </Button>
+                                )}
+                            </div>
+                        ) : fm.view === 'grid' ? (
+                            <FileGrid {...browserProps} />
+                        ) : (
+                            <FileList {...browserProps} sort={fm.sort} direction={fm.direction} onToggleSort={fm.toggleSort} />
+                        )}
+                    </div>
                 </div>
             </div>
 

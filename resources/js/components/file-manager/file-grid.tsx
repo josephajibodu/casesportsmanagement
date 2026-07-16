@@ -3,6 +3,18 @@ import { FileCard, type FileCardActions } from './file-card';
 import { FolderCard } from './folder-card';
 import type { MediaFile, MediaFolder } from './types';
 
+/*
+ * Container queries, not viewport breakpoints.
+ *
+ * The browser renders at very different widths depending on where it lives: the
+ * full-width page, or the picker modal minus its sidebar. Sizing off the
+ * viewport (sm:/lg:/xl:) gave five columns inside a narrow modal and squashed
+ * every card until the names truncated away. `@container` on the scroll area
+ * makes the columns track the space actually available.
+ */
+const FILE_GRID = 'grid grid-cols-2 gap-3 @md:grid-cols-3 @3xl:grid-cols-4 @5xl:grid-cols-5';
+const FOLDER_GRID = 'grid grid-cols-1 gap-3 @xs:grid-cols-2 @3xl:grid-cols-3 @5xl:grid-cols-4';
+
 export type BrowserProps = {
     folders: MediaFolder[];
     files: MediaFile[];
@@ -32,7 +44,7 @@ export function FileGrid({
 }: BrowserProps) {
     if (loading) {
         return (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            <div className={FILE_GRID}>
                 {Array.from({ length: 10 }).map((_, i) => (
                     <Skeleton key={i} className="aspect-[4/5] rounded-xl" />
                 ))}
@@ -45,7 +57,7 @@ export function FileGrid({
             {folders.length > 0 && (
                 <div>
                     <h3 className="mb-2 text-xs font-medium text-muted-foreground uppercase">Folders</h3>
-                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    <div className={FOLDER_GRID}>
                         {folders.map((folder) => (
                             <FolderCard
                                 key={folder.id}
@@ -64,7 +76,7 @@ export function FileGrid({
             {files.length > 0 && (
                 <div>
                     {folders.length > 0 && <h3 className="mb-2 text-xs font-medium text-muted-foreground uppercase">Files</h3>}
-                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    <div className={FILE_GRID}>
                         {files.map((file) => (
                             <FileCard
                                 key={file.id}
