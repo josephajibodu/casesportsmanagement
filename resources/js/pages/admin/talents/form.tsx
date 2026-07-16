@@ -1,10 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { FileVideo, X } from 'lucide-react';
-import { useState } from 'react';
-import { ImageUpload } from '@/components/admin/image-upload';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { NativeSelect } from '@/components/admin/native-select';
 import { Repeater } from '@/components/admin/repeater';
+import { FilePicker, MultiFilePicker, type PickedFile } from '@/components/file-manager/file-picker-field';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +29,7 @@ type Talent = {
     sort_order: number;
     meta_title: string | null;
     meta_description: string | null;
+    photo: string | null;
     photo_url: string | null;
 };
 
@@ -38,11 +37,6 @@ type Options = { types: string[]; statuses: string[] };
 
 export default function TalentForm({ talent, options }: { talent: Talent | null; options: Options }) {
     const isEdit = !!talent;
-
-    const [existingGallery, setExistingGallery] = useState(talent?.gallery ?? []);
-    const [uploadPreviews, setUploadPreviews] = useState<string[]>([]);
-    const [existingVideos, setExistingVideos] = useState(talent?.videos ?? []);
-    const [videoNames, setVideoNames] = useState<string[]>([]);
 
     const form = useForm<{
         type: string;
@@ -57,13 +51,11 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
         is_featured: boolean;
         meta_title: string;
         meta_description: string;
-        photo: File | null;
+        photo: PickedFile | null;
         career_history: Row[];
         video_links: Row[];
-        existing_gallery: string[];
-        gallery_uploads: File[];
-        existing_videos: string[];
-        video_uploads: File[];
+        gallery_images: PickedFile[];
+        video_files: PickedFile[];
     }>({
         type: talent?.type ?? 'player',
         full_name: talent?.full_name ?? '',
@@ -77,55 +69,29 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
         is_featured: talent?.is_featured ?? false,
         meta_title: talent?.meta_title ?? '',
         meta_description: talent?.meta_description ?? '',
-        photo: null,
+        photo: talent?.photo ? { path: talent.photo, url: talent.photo_url } : null,
         career_history: talent?.career_history ?? [],
         video_links: talent?.video_links ?? [],
-        existing_gallery: (talent?.gallery ?? []).map((g) => g.path),
-        gallery_uploads: [],
-        existing_videos: (talent?.videos ?? []).map((v) => v.path),
-        video_uploads: [],
+        gallery_images: (talent?.gallery ?? []).map((g) => ({ ...g, type: 'image' as const })),
+        video_files: (talent?.videos ?? []).map((v) => ({ ...v, type: 'video' as const })),
     });
 
     const { data, setData, errors, processing } = form;
 
-    function removeExistingGallery(path: string) {
-        setExistingGallery((prev) => prev.filter((g) => g.path !== path));
-        setData('existing_gallery', data.existing_gallery.filter((p) => p !== path));
-    }
-    function addGalleryUploads(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = Array.from(e.target.files ?? []);
-        setData('gallery_uploads', [...data.gallery_uploads, ...files]);
-        setUploadPreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
-        e.target.value = '';
-    }
-    function removeGalleryUpload(index: number) {
-        setData('gallery_uploads', data.gallery_uploads.filter((_, i) => i !== index));
-        setUploadPreviews((prev) => prev.filter((_, i) => i !== index));
-    }
-
-    function removeExistingVideo(path: string) {
-        setExistingVideos((prev) => prev.filter((v) => v.path !== path));
-        setData('existing_videos', data.existing_videos.filter((p) => p !== path));
-    }
-    function addVideoUploads(e: React.ChangeEvent<HTMLInputElement>) {
-        const files = Array.from(e.target.files ?? []);
-        setData('video_uploads', [...data.video_uploads, ...files]);
-        setVideoNames((prev) => [...prev, ...files.map((f) => f.name)]);
-        e.target.value = '';
-    }
-    function removeVideoUpload(index: number) {
-        setData('video_uploads', data.video_uploads.filter((_, i) => i !== index));
-        setVideoNames((prev) => prev.filter((_, i) => i !== index));
-    }
-
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, preserveScroll: true };
+        // Pickers hold { path, url }; the server only wants the paths.
+        form.transform((d) => ({
+            ...d,
+            photo: d.photo?.path ?? null,
+            gallery_images: d.gallery_images.map((f) => f.path),
+            video_files: d.video_files.map((f) => f.path),
+        }));
+
         if (isEdit) {
-            form.transform((d) => ({ ...d, _method: 'PUT' }));
-            form.post(`/admin/talents/${talent!.id}`, opts);
+            form.put(`/admin/talents/${talent!.id}`, { preserveScroll: true });
         } else {
-            form.post('/admin/talents', opts);
+            form.post('/admin/talents', { preserveScroll: true });
         }
     }
 
@@ -173,7 +139,7 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
                                     <Input id="current_club" value={data.current_club} onChange={(e) => setData('current_club', e.target.value)} />
                                 </Field>
                             </div>
-                            <ImageUpload label="Profile photo" currentUrl={talent?.photo_url} error={errors.photo} onFile={(f) => setData('photo', f)} hint="JPG or PNG, up to 5MB." />
+                            <FilePicker label="Profile photo" value={data.photo} error={errors.photo} onChange={(f) => setData('photo', f)} />
                             <Field label="Biography" htmlFor="biography" error={errors.biography}>
                                 <Textarea id="biography" rows={6} value={data.biography} onChange={(e) => setData('biography', e.target.value)} />
                             </Field>
@@ -188,40 +154,14 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
                                 addLabel="Add club"
                             />
 
-                            {/* Uploaded highlight videos (stored on the media disk / S3) */}
-                            <div className="grid gap-3">
-                                <Label>Highlight videos (uploads)</Label>
-                                {(existingVideos.length > 0 || videoNames.length > 0) && (
-                                    <div className="grid gap-2">
-                                        {existingVideos.map((v) => (
-                                            <div key={v.path} className="flex items-center gap-3 rounded-lg border p-2">
-                                                <video src={v.url} className="h-12 w-20 rounded bg-black object-cover" />
-                                                <span className="flex-1 truncate text-sm text-muted-foreground">{v.path.split('/').pop()}</span>
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeExistingVideo(v.path)} aria-label="Remove">
-                                                    <X className="size-4 text-destructive" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                        {videoNames.map((name, i) => (
-                                            <div key={`${name}-${i}`} className="flex items-center gap-3 rounded-lg border border-dashed p-2">
-                                                <span className="flex h-12 w-20 items-center justify-center rounded bg-muted"><FileVideo className="size-5 text-muted-foreground" /></span>
-                                                <span className="flex-1 truncate text-sm">{name}</span>
-                                                <Button type="button" variant="ghost" size="icon" onClick={() => removeVideoUpload(i)} aria-label="Remove">
-                                                    <X className="size-4 text-destructive" />
-                                                </Button>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-                                <input
-                                    type="file"
-                                    accept="video/mp4,video/quicktime,video/webm,video/ogg,.mp4,.mov,.webm,.ogg,.m4v"
-                                    multiple
-                                    onChange={addVideoUploads}
-                                    className="block text-sm text-muted-foreground file:mr-3 file:rounded-md file:border file:border-input file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-accent"
-                                />
-                                <p className="text-xs text-muted-foreground">MP4, MOV, WEBM up to 500MB. Served from S3-compatible storage in production.</p>
-                            </div>
+                            <MultiFilePicker
+                                label="Highlight videos (uploaded)"
+                                values={data.video_files}
+                                onChange={(files) => setData('video_files', files)}
+                                accept={['video/*']}
+                                buttonLabel="Add videos"
+                                hint="Served from S3-compatible storage in production."
+                            />
 
                             <Repeater
                                 label="Highlight videos (external links)"
@@ -233,21 +173,13 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
                         </FormSection>
 
                         <FormSection title="Gallery" description="Additional images for the profile.">
-                            <div className="flex flex-wrap gap-3">
-                                {existingGallery.map((g) => (
-                                    <div key={g.path} className="relative size-24 overflow-hidden rounded-lg border">
-                                        <img src={g.url} alt="" className="size-full object-cover" />
-                                        <button type="button" onClick={() => removeExistingGallery(g.path)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white" aria-label="Remove image"><X className="size-3" /></button>
-                                    </div>
-                                ))}
-                                {uploadPreviews.map((src, i) => (
-                                    <div key={src} className="relative size-24 overflow-hidden rounded-lg border">
-                                        <img src={src} alt="" className="size-full object-cover" />
-                                        <button type="button" onClick={() => removeGalleryUpload(i)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white" aria-label="Remove image"><X className="size-3" /></button>
-                                    </div>
-                                ))}
-                            </div>
-                            <input type="file" accept="image/*" multiple onChange={addGalleryUploads} className="block text-sm text-muted-foreground file:mr-3 file:rounded-md file:border file:border-input file:bg-background file:px-3 file:py-1.5 file:text-sm file:font-medium hover:file:bg-accent" />
+                            <MultiFilePicker
+                                label="Gallery images"
+                                values={data.gallery_images}
+                                onChange={(files) => setData('gallery_images', files)}
+                                accept={['image/*']}
+                                buttonLabel="Add images"
+                            />
                         </FormSection>
 
                         <FormSection title="Publishing & SEO" description="Visibility, ordering and search metadata.">

@@ -30,7 +30,8 @@ class NewsArticleRequest extends FormRequest
             'published_at' => ['nullable', 'date'],
             'meta_title' => ['nullable', 'string', 'max:160'],
             'meta_description' => ['nullable', 'string', 'max:300'],
-            'featured_image' => ['nullable', 'image', 'max:5120'],
+            // Chosen in the File Manager, so the form submits a storage path.
+            'featured_image' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

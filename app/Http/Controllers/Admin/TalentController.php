@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\Concerns\HandlesUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TalentRequest;
 use App\Models\Talent;
@@ -13,8 +12,6 @@ use Inertia\Response;
 
 class TalentController extends Controller
 {
-    use HandlesUploads;
-
     public function index(Request $request): Response
     {
         $search = $request->string('search')->toString();
@@ -82,6 +79,7 @@ class TalentController extends Controller
                 'sort_order' => $talent->sort_order,
                 'meta_title' => $talent->meta_title,
                 'meta_description' => $talent->meta_description,
+                'photo' => $talent->photo,
                 'photo_url' => media_url($talent->photo),
             ],
             'options' => $this->options(),
@@ -100,10 +98,8 @@ class TalentController extends Controller
 
     public function destroy(Talent $talent): RedirectResponse
     {
-        $this->deleteUpload($talent->photo);
-        foreach (array_merge($talent->gallery_images ?? [], $talent->video_files ?? []) as $path) {
-            $this->deleteUpload($path);
-        }
+        // Media lives in the File Manager library and may be reused elsewhere,
+        // so deleting a profile never removes the underlying files.
         $talent->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Profile deleted.']);
@@ -122,49 +118,14 @@ class TalentController extends Controller
 
     protected function fill(Talent $talent, TalentRequest $request): void
     {
-        $data = $request->safe()->except([
-            'photo', 'gallery_uploads', 'existing_gallery', 'video_uploads', 'existing_videos',
-        ]);
+        $data = $request->safe()->all();
 
         $data['career_history'] = $this->cleanRows($request->input('career_history'), ['club', 'years']);
         $data['video_links'] = $this->cleanRows($request->input('video_links'), ['label', 'url']);
-        $data['photo'] = $this->storeUpload($request->file('photo'), 'talents', $talent->photo);
-        $data['gallery_images'] = $this->buildStoredList(
-            $request, $talent, 'existing_gallery', 'gallery_uploads', 'talents/gallery', $talent->gallery_images ?? []
-        );
-        $data['video_files'] = $this->buildStoredList(
-            $request, $talent, 'existing_videos', 'video_uploads', 'talents/videos', $talent->video_files ?? []
-        );
+        $data['gallery_images'] = array_values(array_filter($request->input('gallery_images', [])));
+        $data['video_files'] = array_values(array_filter($request->input('video_files', [])));
 
         $talent->fill($data);
-    }
-
-    /**
-     * Merge kept existing paths with newly uploaded files, deleting anything removed.
-     *
-     * @param  array<int, string>  $existingPaths
-     * @return array<int, string>
-     */
-    protected function buildStoredList(
-        TalentRequest $request,
-        Talent $talent,
-        string $keepKey,
-        string $uploadKey,
-        string $folder,
-        array $existingPaths,
-    ): array {
-        $kept = collect($request->input($keepKey, []))->filter()->values();
-
-        foreach ($existingPaths as $path) {
-            if (! $kept->contains($path)) {
-                $this->deleteUpload($path);
-            }
-        }
-
-        $uploaded = collect($request->file($uploadKey, []))
-            ->map(fn ($file) => $file->store($folder, $this->mediaDisk()));
-
-        return $kept->merge($uploaded)->values()->all();
     }
 
     /**

@@ -34,7 +34,8 @@ class TalentRequest extends FormRequest
             'meta_title' => ['nullable', 'string', 'max:160'],
             'meta_description' => ['nullable', 'string', 'max:300'],
 
-            'photo' => ['nullable', 'image', 'max:5120'],
+            // Media is chosen in the File Manager, so forms submit storage paths.
+            'photo' => ['nullable', 'string', 'max:500'],
 
             'career_history' => ['nullable', 'array'],
             'career_history.*.club' => ['nullable', 'string', 'max:160'],
@@ -44,15 +45,11 @@ class TalentRequest extends FormRequest
             'video_links.*.label' => ['nullable', 'string', 'max:120'],
             'video_links.*.url' => ['nullable', 'url', 'max:500'],
 
-            'existing_videos' => ['nullable', 'array'],
-            'existing_videos.*' => ['string'],
-            'video_uploads' => ['nullable', 'array'],
-            'video_uploads.*' => ['file', 'mimes:mp4,mov,webm,ogg,m4v', 'max:512000'],
+            'video_files' => ['nullable', 'array'],
+            'video_files.*' => ['string', 'max:500'],
 
-            'existing_gallery' => ['nullable', 'array'],
-            'existing_gallery.*' => ['string'],
-            'gallery_uploads' => ['nullable', 'array'],
-            'gallery_uploads.*' => ['image', 'max:5120'],
+            'gallery_images' => ['nullable', 'array'],
+            'gallery_images.*' => ['string', 'max:500'],
         ];
     }
 

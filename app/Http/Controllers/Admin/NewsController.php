@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\Concerns\HandlesUploads;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\NewsArticleRequest;
 use App\Models\NewsArticle;
@@ -13,8 +12,6 @@ use Inertia\Response;
 
 class NewsController extends Controller
 {
-    use HandlesUploads;
-
     public function index(Request $request): Response
     {
         $search = $request->string('search')->toString();
@@ -72,6 +69,7 @@ class NewsController extends Controller
                 'published_at' => $news->published_at?->format('Y-m-d\TH:i'),
                 'meta_title' => $news->meta_title,
                 'meta_description' => $news->meta_description,
+                'featured_image' => $news->featured_image,
                 'image_url' => media_url($news->featured_image),
             ],
             'options' => $this->options(),
@@ -90,7 +88,6 @@ class NewsController extends Controller
 
     public function destroy(NewsArticle $news): RedirectResponse
     {
-        $this->deleteUpload($news->featured_image);
         $news->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Article deleted.']);
@@ -100,8 +97,7 @@ class NewsController extends Controller
 
     protected function fill(NewsArticle $article, NewsArticleRequest $request): void
     {
-        $data = $request->safe()->except('featured_image');
-        $data['featured_image'] = $this->storeUpload($request->file('featured_image'), 'news', $article->featured_image);
+        $data = $request->safe()->all();
 
         // Auto-set a publish date when publishing without one.
         if ($data['status'] === 'published' && blank($data['published_at'] ?? null)) {

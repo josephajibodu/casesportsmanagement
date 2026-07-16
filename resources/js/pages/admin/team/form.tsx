@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ImageUpload } from '@/components/admin/image-upload';
+import { FilePicker, type PickedFile } from '@/components/file-manager/file-picker-field';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ type Member = {
     title: string | null;
     bio: string | null;
     sort_order: number;
+    photo: string | null;
     photo_url: string | null;
 };
 
@@ -22,25 +23,26 @@ export default function TeamForm({ member }: { member: Member | null }) {
         title: string;
         bio: string;
         sort_order: number;
-        photo: File | null;
+        photo: PickedFile | null;
     }>({
         full_name: member?.full_name ?? '',
         title: member?.title ?? '',
         bio: member?.bio ?? '',
         sort_order: member?.sort_order ?? 0,
-        photo: null,
+        photo: member?.photo ? { path: member.photo, url: member.photo_url } : null,
     });
 
     const { data, setData, errors, processing } = form;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, preserveScroll: true };
+        // The picker holds { path, url }; the server only wants the path.
+        form.transform((d) => ({ ...d, photo: d.photo?.path ?? null }));
+
         if (isEdit) {
-            form.transform((d) => ({ ...d, _method: 'PUT' }));
-            form.post(`/admin/team/${member!.id}`, opts);
+            form.put(`/admin/team/${member!.id}`, { preserveScroll: true });
         } else {
-            form.post('/admin/team', opts);
+            form.post('/admin/team', { preserveScroll: true });
         }
     }
 
@@ -62,7 +64,7 @@ export default function TeamForm({ member }: { member: Member | null }) {
                         <Field label="Title / role" htmlFor="title" error={errors.title}>
                             <Input id="title" value={data.title} onChange={(e) => setData('title', e.target.value)} />
                         </Field>
-                        <ImageUpload label="Photo" currentUrl={member?.photo_url} error={errors.photo} onFile={(f) => setData('photo', f)} />
+                        <FilePicker label="Photo" value={data.photo} error={errors.photo} onChange={(f) => setData('photo', f)} />
                         <Field label="Bio" htmlFor="bio" hint="Full bio shown in the Read more modal" error={errors.bio}>
                             <Textarea id="bio" rows={6} value={data.bio} onChange={(e) => setData('bio', e.target.value)} />
                         </Field>

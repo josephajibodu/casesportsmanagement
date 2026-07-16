@@ -8,6 +8,7 @@ use App\Http\Controllers\Public\NewsController;
 use App\Http\Controllers\Public\PartnerController;
 use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Public\TalentController;
+use App\Http\Controllers\SharedFileController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,6 +33,14 @@ Route::get('/contact', [ContactController::class, 'show'])->name('contact');
 Route::post('/contact', [ContactController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('contact.store');
+
+/*
+| Publicly shared files (links generated from the admin File Manager)
+*/
+Route::get('/f/{token}', [SharedFileController::class, 'show'])->name('shared-file.show');
+Route::post('/f/{token}', [SharedFileController::class, 'unlock'])
+    ->middleware('throttle:10,1')
+    ->name('shared-file.unlock');
 
 /*
 | SEO

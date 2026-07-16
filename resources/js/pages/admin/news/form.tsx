@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ImageUpload } from '@/components/admin/image-upload';
+import { FilePicker, type PickedFile } from '@/components/file-manager/file-picker-field';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { NativeSelect } from '@/components/admin/native-select';
 import { RichTextEditor } from '@/components/admin/rich-text-editor';
@@ -18,6 +18,7 @@ type Article = {
     published_at: string | null;
     meta_title: string | null;
     meta_description: string | null;
+    featured_image: string | null;
     image_url: string | null;
 };
 
@@ -36,7 +37,7 @@ export default function NewsForm({ article, options }: { article: Article | null
         published_at: string;
         meta_title: string;
         meta_description: string;
-        featured_image: File | null;
+        featured_image: PickedFile | null;
     }>({
         title: article?.title ?? '',
         slug: article?.slug ?? '',
@@ -47,19 +48,20 @@ export default function NewsForm({ article, options }: { article: Article | null
         published_at: article?.published_at ?? '',
         meta_title: article?.meta_title ?? '',
         meta_description: article?.meta_description ?? '',
-        featured_image: null,
+        featured_image: article?.featured_image ? { path: article.featured_image, url: article.image_url } : null,
     });
 
     const { data, setData, errors, processing } = form;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, preserveScroll: true };
+        // The picker holds { path, url }; the server only wants the path.
+        form.transform((d) => ({ ...d, featured_image: d.featured_image?.path ?? null }));
+
         if (isEdit) {
-            form.transform((d) => ({ ...d, _method: 'PUT' }));
-            form.post(`/admin/news/${article!.id}`, opts);
+            form.put(`/admin/news/${article!.id}`, { preserveScroll: true });
         } else {
-            form.post('/admin/news', opts);
+            form.post('/admin/news', { preserveScroll: true });
         }
     }
 
@@ -98,7 +100,7 @@ export default function NewsForm({ article, options }: { article: Article | null
                             <Field label="Publish date" htmlFor="published_at" hint="Leave blank to auto-set when published" error={errors.published_at}>
                                 <Input id="published_at" type="datetime-local" value={data.published_at} onChange={(e) => setData('published_at', e.target.value)} />
                             </Field>
-                            <ImageUpload label="Featured image" currentUrl={article?.image_url} error={errors.featured_image} onFile={(f) => setData('featured_image', f)} />
+                            <FilePicker label="Featured image" value={data.featured_image} error={errors.featured_image} onChange={(f) => setData('featured_image', f)} />
                             <Field label="Excerpt" htmlFor="excerpt" error={errors.excerpt}>
                                 <Textarea id="excerpt" rows={2} value={data.excerpt} onChange={(e) => setData('excerpt', e.target.value)} />
                             </Field>

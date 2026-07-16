@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\Concerns\HandlesUploads;
 use App\Http\Controllers\Controller;
 use App\Models\MediaItem;
 use App\Models\Talent;
@@ -14,8 +13,6 @@ use Inertia\Response;
 
 class MediaItemController extends Controller
 {
-    use HandlesUploads;
-
     public function index(Request $request): Response
     {
         $type = $request->string('type')->toString();
@@ -72,6 +69,7 @@ class MediaItemController extends Controller
                 'video_url' => $mediaItem->video_url,
                 'talent_id' => $mediaItem->talent_id,
                 'sort_order' => $mediaItem->sort_order,
+                'image_path' => $mediaItem->image_path,
                 'image_url' => media_url($mediaItem->image_path),
             ],
             'options' => $this->options(),
@@ -90,7 +88,7 @@ class MediaItemController extends Controller
 
     public function destroy(MediaItem $mediaItem): RedirectResponse
     {
-        $this->deleteUpload($mediaItem->image_path);
+        // The underlying file stays in the File Manager library.
         $mediaItem->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Media item deleted.']);
@@ -100,12 +98,6 @@ class MediaItemController extends Controller
 
     protected function fill(MediaItem $item, Request $request): void
     {
-        // Require an image upload only when creating an image item that has none yet.
-        $imageRules = ['nullable', 'image', 'max:5120'];
-        if ($request->input('media_type') === 'image' && blank($item->image_path)) {
-            $imageRules[] = 'required';
-        }
-
         $data = $request->validate([
             'media_type' => ['required', Rule::in(MediaItem::TYPES)],
             'category' => ['nullable', 'string', 'max:120'],
@@ -113,22 +105,20 @@ class MediaItemController extends Controller
             'talent_id' => ['nullable', 'exists:talents,id'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'video_url' => ['nullable', 'url', 'max:500', 'required_if:media_type,video'],
-            'image' => $imageRules,
+            // Picked in the File Manager: a storage path, required for images.
+            'image_path' => ['nullable', 'string', 'max:500', 'required_if:media_type,image'],
         ]);
 
-        $mediaType = $data['media_type'];
-
-        if ($mediaType === 'image') {
-            $item->image_path = $this->storeUpload($request->file('image'), 'media', $item->image_path);
+        if ($data['media_type'] === 'image') {
+            $item->image_path = $data['image_path'];
             $item->video_url = null;
         } else {
-            $this->deleteUpload($item->image_path);
             $item->image_path = null;
             $item->video_url = $data['video_url'] ?? null;
         }
 
         $item->fill([
-            'media_type' => $mediaType,
+            'media_type' => $data['media_type'],
             'category' => $data['category'] ?? null,
             'caption' => $data['caption'] ?? null,
             'talent_id' => $data['talent_id'] ?? null,

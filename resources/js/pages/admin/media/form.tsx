@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ImageUpload } from '@/components/admin/image-upload';
+import { FilePicker, type PickedFile } from '@/components/file-manager/file-picker-field';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { NativeSelect } from '@/components/admin/native-select';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,7 @@ type Item = {
     video_url: string | null;
     talent_id: number | null;
     sort_order: number;
+    image_path: string | null;
     image_url: string | null;
 };
 
@@ -33,7 +34,7 @@ export default function MediaForm({ item, options }: { item: Item | null; option
         video_url: string;
         talent_id: string;
         sort_order: number;
-        image: File | null;
+        image_path: PickedFile | null;
     }>({
         media_type: item?.media_type ?? 'image',
         category: item?.category ?? '',
@@ -41,7 +42,7 @@ export default function MediaForm({ item, options }: { item: Item | null; option
         video_url: item?.video_url ?? '',
         talent_id: item?.talent_id ? String(item.talent_id) : '',
         sort_order: item?.sort_order ?? 0,
-        image: null,
+        image_path: item?.image_path ? { path: item.image_path, url: item.image_url } : null,
     });
 
     const { data, setData, errors, processing } = form;
@@ -50,12 +51,13 @@ export default function MediaForm({ item, options }: { item: Item | null; option
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, preserveScroll: true };
+        // The picker holds { path, url }; the server only wants the path.
+        form.transform((d) => ({ ...d, image_path: d.image_path?.path ?? null }));
+
         if (isEdit) {
-            form.transform((d) => ({ ...d, _method: 'PUT' }));
-            form.post(`/admin/media/${item!.id}`, opts);
+            form.put(`/admin/media/${item!.id}`, { preserveScroll: true });
         } else {
-            form.post('/admin/media', opts);
+            form.post('/admin/media', { preserveScroll: true });
         }
     }
 
@@ -86,7 +88,7 @@ export default function MediaForm({ item, options }: { item: Item | null; option
                         </div>
 
                         {data.media_type === 'image' ? (
-                            <ImageUpload label="Image" currentUrl={item?.image_url} error={errors.image} onFile={(f) => setData('image', f)} />
+                            <FilePicker label="Image" value={data.image_path} error={errors.image_path} onChange={(f) => setData('image_path', f)} />
                         ) : (
                             <Field label="Video URL (YouTube / Vimeo)" htmlFor="video_url" error={errors.video_url}>
                                 <Input id="video_url" value={data.video_url} onChange={(e) => setData('video_url', e.target.value)} placeholder="https://youtube.com/watch?v=..." />

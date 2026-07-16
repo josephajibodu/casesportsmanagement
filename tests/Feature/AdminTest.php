@@ -35,19 +35,22 @@ it('renders each admin index', function (string $path) {
     '/admin/team',
     '/admin/partners',
     '/admin/media',
+    '/admin/files',
     '/admin/enquiries',
     '/admin/site-settings',
 ]);
 
-it('creates a talent with an uploaded photo', function () {
+it('creates a talent with media chosen from the file manager', function () {
     actingAs($this->user)->post('/admin/talents', [
         'type' => 'player',
         'full_name' => 'Test Winger',
         'status' => 'published',
         'is_featured' => '1',
         'sort_order' => 0,
-        'photo' => UploadedFile::fake()->image('player.jpg'),
-        'career_history' => [['club' => 'Test FC', 'years' => '2020–2023'], ['club' => '', 'years' => '']],
+        'photo' => 'media/2026/07/player.jpg',
+        'gallery_images' => ['media/2026/07/a.jpg', 'media/2026/07/b.jpg'],
+        'video_files' => ['media/2026/07/reel.mp4'],
+        'career_history' => [['club' => 'Test FC', 'years' => '2020-2023'], ['club' => '', 'years' => '']],
         'video_links' => [['label' => 'Reel', 'url' => 'https://youtube.com/watch?v=abc']],
     ])->assertRedirect('/admin/talents');
 
@@ -57,23 +60,9 @@ it('creates a talent with an uploaded photo', function () {
         ->and($talent->is_featured)->toBeTrue()
         ->and($talent->slug)->toBe('test-winger')
         ->and($talent->career_history)->toHaveCount(1) // empty row dropped
-        ->and($talent->photo)->not->toBeNull();
-
-    Storage::disk('public')->assertExists($talent->photo);
-});
-
-it('uploads highlight videos for a talent', function () {
-    actingAs($this->user)->post('/admin/talents', [
-        'type' => 'player',
-        'full_name' => 'Video Star',
-        'status' => 'published',
-        'video_uploads' => [UploadedFile::fake()->create('reel.mp4', 2048, 'video/mp4')],
-    ])->assertRedirect('/admin/talents');
-
-    $talent = Talent::firstWhere('full_name', 'Video Star');
-
-    expect($talent->video_files)->toHaveCount(1);
-    Storage::disk('public')->assertExists($talent->video_files[0]);
+        ->and($talent->photo)->toBe('media/2026/07/player.jpg')
+        ->and($talent->gallery_images)->toHaveCount(2)
+        ->and($talent->video_files)->toBe(['media/2026/07/reel.mp4']);
 });
 
 it('updates a talent', function () {
@@ -99,14 +88,14 @@ it('toggles featured', function () {
     expect($talent->fresh()->is_featured)->toBeTrue();
 });
 
-it('deletes a talent and its photo', function () {
-    $path = UploadedFile::fake()->image('p.jpg')->store('talents', 'public');
+it('deletes a talent but keeps its media in the library', function () {
+    $path = UploadedFile::fake()->image('p.jpg')->store('media', 'public');
     $talent = Talent::factory()->create(['photo' => $path]);
 
     actingAs($this->user)->delete("/admin/talents/{$talent->id}")->assertRedirect('/admin/talents');
 
     expect(Talent::find($talent->id))->toBeNull();
-    Storage::disk('public')->assertMissing($path);
+    Storage::disk('public')->assertExists($path);
 });
 
 it('creates a news article and auto-sets publish date', function () {
@@ -145,7 +134,7 @@ it('creates an image media item', function () {
         'media_type' => 'image',
         'category' => 'Events',
         'caption' => 'A moment',
-        'image' => UploadedFile::fake()->image('shot.jpg'),
+        'image_path' => 'media/2026/07/shot.jpg',
     ])->assertRedirect('/admin/media');
 
     expect(MediaItem::where('caption', 'A moment')->exists())->toBeTrue();

@@ -5,6 +5,7 @@ import {
     Newspaper,
     UserRound,
     Images,
+    FolderOpen,
     Handshake,
     Mail,
     Settings2,
@@ -32,6 +33,7 @@ const mainNavItems: NavItem[] = [
     { title: 'Team', href: '/admin/team', icon: UserRound },
     { title: 'Gallery', href: '/admin/media', icon: Images },
     { title: 'Partners', href: '/admin/partners', icon: Handshake },
+    { title: 'Files', href: '/admin/files', icon: FolderOpen },
     { title: 'Enquiries', href: '/admin/enquiries', icon: Mail },
     { title: 'Site Settings', href: '/admin/site-settings', icon: Settings2 },
 ];

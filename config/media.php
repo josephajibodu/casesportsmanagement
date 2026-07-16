@@ -17,4 +17,16 @@ return [
 
     'disk' => env('MEDIA_DISK', 'public'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Maximum upload size (kilobytes)
+    |--------------------------------------------------------------------------
+    |
+    | Applied to every file uploaded through the admin File Manager. Keep this
+    | in step with the web server's upload_max_filesize / post_max_size.
+    |
+    */
+
+    'max_upload_kb' => (int) env('MEDIA_MAX_UPLOAD_KB', 51200), // 50 MB
+
 ];

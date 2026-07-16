@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ImageUpload } from '@/components/admin/image-upload';
+import { FilePicker, type PickedFile } from '@/components/file-manager/file-picker-field';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,6 +10,7 @@ type Partner = {
     name: string;
     description: string | null;
     sort_order: number;
+    logo: string | null;
     logo_url: string | null;
 };
 
@@ -20,24 +21,25 @@ export default function PartnerForm({ partner }: { partner: Partner | null }) {
         name: string;
         description: string;
         sort_order: number;
-        logo: File | null;
+        logo: PickedFile | null;
     }>({
         name: partner?.name ?? '',
         description: partner?.description ?? '',
         sort_order: partner?.sort_order ?? 0,
-        logo: null,
+        logo: partner?.logo ? { path: partner.logo, url: partner.logo_url } : null,
     });
 
     const { data, setData, errors, processing } = form;
 
     function submit(e: React.FormEvent) {
         e.preventDefault();
-        const opts = { forceFormData: true, preserveScroll: true };
+        // The picker holds { path, url }; the server only wants the path.
+        form.transform((d) => ({ ...d, logo: d.logo?.path ?? null }));
+
         if (isEdit) {
-            form.transform((d) => ({ ...d, _method: 'PUT' }));
-            form.post(`/admin/partners/${partner!.id}`, opts);
+            form.put(`/admin/partners/${partner!.id}`, { preserveScroll: true });
         } else {
-            form.post('/admin/partners', opts);
+            form.post('/admin/partners', { preserveScroll: true });
         }
     }
 
@@ -56,7 +58,7 @@ export default function PartnerForm({ partner }: { partner: Partner | null }) {
                         <Field label="Name" htmlFor="name" required error={errors.name}>
                             <Input id="name" value={data.name} onChange={(e) => setData('name', e.target.value)} required />
                         </Field>
-                        <ImageUpload label="Logo" currentUrl={partner?.logo_url} error={errors.logo} onFile={(f) => setData('logo', f)} hint="Transparent PNG works best." />
+                        <FilePicker label="Logo" value={data.logo} error={errors.logo} onChange={(f) => setData('logo', f)} hint="Transparent PNG works best." />
                         <Field label="Description" htmlFor="description" hint="Optional" error={errors.description}>
                             <Textarea id="description" rows={3} value={data.description} onChange={(e) => setData('description', e.target.value)} />
                         </Field>

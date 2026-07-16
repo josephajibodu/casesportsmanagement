@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Admin\Concerns\HandlesUploads;
 use App\Http\Controllers\Controller;
 use App\Models\TeamMember;
 use Illuminate\Http\RedirectResponse;
@@ -12,8 +11,6 @@ use Inertia\Response;
 
 class TeamMemberController extends Controller
 {
-    use HandlesUploads;
-
     public function index(): Response
     {
         return Inertia::render('admin/team/index', [
@@ -52,6 +49,7 @@ class TeamMemberController extends Controller
                 'title' => $teamMember->title,
                 'bio' => $teamMember->bio,
                 'sort_order' => $teamMember->sort_order,
+                'photo' => $teamMember->photo,
                 'photo_url' => media_url($teamMember->photo),
             ],
         ]);
@@ -69,7 +67,6 @@ class TeamMemberController extends Controller
 
     public function destroy(TeamMember $teamMember): RedirectResponse
     {
-        $this->deleteUpload($teamMember->photo);
         $teamMember->delete();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Team member deleted.']);
@@ -95,10 +92,9 @@ class TeamMemberController extends Controller
             'title' => ['nullable', 'string', 'max:120'],
             'bio' => ['nullable', 'string', 'max:2000'],
             'sort_order' => ['nullable', 'integer', 'min:0'],
-            'photo' => ['nullable', 'image', 'max:5120'],
+            'photo' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $data['photo'] = $this->storeUpload($request->file('photo'), 'team', $member->photo);
         $member->fill($data);
     }
 }
