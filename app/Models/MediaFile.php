@@ -156,24 +156,23 @@ class MediaFile extends Model
     }
 
     /**
-     * Browser-usable URL for the stored file. Falls back to a temporary signed
-     * URL on drivers that do not expose public URLs (e.g. private S3 buckets).
+     * Browser-usable URL for the stored file.
+     *
+     * With media.signed_urls enabled (a bucket with no public domain) this is a
+     * short-lived signed URL. Otherwise it is the disk's permanent public URL.
      */
     public function url(): ?string
     {
-        $disk = Storage::disk($this->storageDisk());
-
-        try {
-            return $disk->url($this->path);
-        } catch (\RuntimeException) {
-            return $this->temporaryUrl();
-        }
+        return media_url($this->path, $this->storageDisk());
     }
 
-    public function temporaryUrl(int $minutes = 60): ?string
+    public function temporaryUrl(?int $minutes = null): ?string
     {
         try {
-            return Storage::disk($this->storageDisk())->temporaryUrl($this->path, now()->addMinutes($minutes));
+            return Storage::disk($this->storageDisk())->temporaryUrl(
+                $this->path,
+                now()->addMinutes($minutes ?? config('media.signed_url_ttl', 60)),
+            );
         } catch (\Throwable) {
             return null;
         }

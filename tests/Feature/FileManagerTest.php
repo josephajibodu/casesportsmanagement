@@ -300,3 +300,85 @@ it('asks for a password on a protected share link', function () {
     post("/f/{$file->share_token}", ['password' => 'letmein'])
         ->assertRedirect(route('shared-file.show', $file->share_token));
 });
+
+/*
+|--------------------------------------------------------------------------
+| Storage drivers
+|
+| The File Manager only ever talks to the Storage API, so swapping MEDIA_DISK
+| to an S3-compatible provider (R2) must not need any other change.
+|--------------------------------------------------------------------------
+*/
+
+it('stores uploads on the configured media disk and records it per file', function () {
+    Storage::fake('r2');
+    config(['media.disk' => 'r2']);
+
+    actingAs($this->user)->post('/admin/file-manager/files', [
+        'files' => [UploadedFile::fake()->image('on-r2.jpg')],
+    ])->assertCreated();
+
+    $file = MediaFile::first();
+
+    // The disk is recorded on the row, so files keep resolving through the
+    // disk they were written to even after MEDIA_DISK changes later.
+    expect($file->disk)->toBe('r2');
+    Storage::disk('r2')->assertExists($file->path);
+    Storage::disk('public')->assertMissing($file->path);
+});
+
+it('builds public r2 urls from the bucket domain', function () {
+    // A real R2 disk: building a URL is local, so this needs no network.
+    config([
+        'filesystems.disks.r2.key' => 'test-key',
+        'filesystems.disks.r2.secret' => 'test-secret',
+        'filesystems.disks.r2.bucket' => 'case-media',
+        'filesystems.disks.r2.endpoint' => 'https://account.r2.cloudflarestorage.com',
+        'filesystems.disks.r2.url' => 'https://media.example.com',
+    ]);
+
+    $file = MediaFile::factory()->create(['disk' => 'r2', 'path' => 'media/2026/07/a.jpg']);
+
+    expect($file->url())->toBe('https://media.example.com/media/2026/07/a.jpg');
+});
+
+it('serves signed r2 urls when the bucket has no public domain', function () {
+    config([
+        'media.signed_urls' => true,
+        'filesystems.disks.r2.key' => 'test-key',
+        'filesystems.disks.r2.secret' => 'test-secret',
+        'filesystems.disks.r2.bucket' => 'case-media',
+        'filesystems.disks.r2.endpoint' => 'https://account.r2.cloudflarestorage.com',
+        'filesystems.disks.r2.url' => null,
+    ]);
+
+    $file = MediaFile::factory()->create(['disk' => 'r2', 'path' => 'media/2026/07/a.jpg']);
+    $url = $file->url();
+
+    expect($url)->toContain('media/2026/07/a.jpg')
+        ->and($url)->toContain('X-Amz-Signature')
+        ->and($url)->toContain('X-Amz-Expires');
+});
+
+it('leaves absolute urls untouched', function () {
+    expect(media_url('https://picsum.photos/seed/x/900/1100'))
+        ->toBe('https://picsum.photos/seed/x/900/1100');
+});
+
+it('does not break when a disk cannot sign urls', function () {
+    config(['media.signed_urls' => true]);
+
+    // The local disk has no temporaryUrl support, so it must fall back to the
+    // public URL rather than throwing.
+    expect(media_url('media/2026/07/a.jpg'))->toContain('media/2026/07/a.jpg');
+});
+
+it('r2 is configured the way cloudflare requires', function () {
+    $disk = config('filesystems.disks.r2');
+
+    // R2 has no ACLs: sending `ACL: public-read` is rejected, so visibility
+    // must stay private and public access comes from the bucket domain.
+    expect($disk['visibility'])->toBe('private')
+        ->and($disk['driver'])->toBe('s3')
+        ->and($disk['region'])->toBe('auto');
+});

@@ -60,6 +60,37 @@ return [
             'report' => false,
         ],
 
+        /*
+        | Cloudflare R2 (S3-compatible).
+        |
+        | R2 differs from AWS S3 in three ways that matter here:
+        |
+        | 1. It has no ACLs. Visibility must stay "private" so the adapter never
+        |    sends an `ACL: public-read` header. Public access on R2 is granted
+        |    by attaching a public domain to the bucket, not per object.
+        | 2. The region is always "auto".
+        | 3. Public URLs come from R2_URL (your custom domain or the r2.dev
+        |    development URL). Leave R2_URL empty for a fully private bucket and
+        |    set MEDIA_SIGNED_URLS=true to serve short-lived signed URLs instead.
+        */
+        'r2' => [
+            'driver' => 's3',
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => env('R2_DEFAULT_REGION', 'auto'),
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => env('R2_USE_PATH_STYLE_ENDPOINT', false),
+            'visibility' => 'private',
+            // The AWS SDK's default integrity checksums are not accepted by
+            // every S3-compatible provider; only send them when required.
+            'request_checksum_calculation' => env('R2_REQUEST_CHECKSUM_CALCULATION', 'when_required'),
+            'response_checksum_validation' => env('R2_RESPONSE_CHECKSUM_VALIDATION', 'when_required'),
+            'throw' => false,
+            'report' => false,
+        ],
+
     ],
 
     /*

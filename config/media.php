@@ -29,4 +29,22 @@ return [
 
     'max_upload_kb' => (int) env('MEDIA_MAX_UPLOAD_KB', 51200), // 50 MB
 
+    /*
+    |--------------------------------------------------------------------------
+    | Signed URLs
+    |--------------------------------------------------------------------------
+    |
+    | Enable only when the media bucket has no public domain. Every media URL
+    | then becomes a short-lived signed URL.
+    |
+    | Leave this false for the public website: signed URLs expire, which breaks
+    | browser and CDN caching and is no good for SEO. The recommended R2 setup
+    | is a public custom domain in R2_URL, which yields permanent URLs.
+    |
+    */
+
+    'signed_urls' => (bool) env('MEDIA_SIGNED_URLS', false),
+
+    'signed_url_ttl' => (int) env('MEDIA_SIGNED_URL_TTL', 60), // minutes
+
 ];

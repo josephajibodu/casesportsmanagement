@@ -5,12 +5,16 @@ use Illuminate\Support\Str;
 
 if (! function_exists('media_url')) {
     /**
-     * Resolve a media reference to a usable URL.
+     * Resolve a media reference to a browser-usable URL.
      *
-     * Accepts either an absolute URL (e.g. seeded/remote images) or a path on
-     * the public disk (e.g. admin uploads), returning a browser-usable URL.
+     * Accepts an absolute URL (e.g. seeded remote images) or a path on the
+     * media disk. Works identically on local storage and any S3-compatible
+     * provider (R2, MinIO, S3), because the URL always comes from the disk.
+     *
+     * When media.signed_urls is enabled the bucket has no public domain, so a
+     * short-lived signed URL is returned instead of a permanent public one.
      */
-    function media_url(?string $path): ?string
+    function media_url(?string $path, ?string $disk = null): ?string
     {
         if (blank($path)) {
             return null;
@@ -20,7 +24,21 @@ if (! function_exists('media_url')) {
             return $path;
         }
 
-        return Storage::disk(config('media.disk'))->url($path);
+        $storage = Storage::disk($disk ?? config('media.disk'));
+
+        if (config('media.signed_urls')) {
+            try {
+                return $storage->temporaryUrl($path, now()->addMinutes(config('media.signed_url_ttl', 60)));
+            } catch (Throwable) {
+                // Driver cannot sign (e.g. the local disk); fall through.
+            }
+        }
+
+        try {
+            return $storage->url($path);
+        } catch (RuntimeException) {
+            return null;
+        }
     }
 }
 
