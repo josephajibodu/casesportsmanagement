@@ -67,8 +67,19 @@ class TalentController extends Controller
                 'full_name' => $talent->full_name,
                 'slug' => $talent->slug,
                 'position' => $talent->position,
+                'shirt_number' => $talent->shirt_number,
+                'secondary_positions' => $talent->secondary_positions ?? [],
                 'nationality' => $talent->nationality,
+                'secondary_nationality' => $talent->secondary_nationality,
+                'date_of_birth' => $talent->date_of_birth?->format('Y-m-d'),
+                'place_of_birth' => $talent->place_of_birth,
+                'height_cm' => $talent->height_cm,
+                'weight_kg' => $talent->weight_kg,
+                'preferred_foot' => $talent->preferred_foot,
                 'current_club' => $talent->current_club,
+                'contract_status' => $talent->contract_status,
+                'contract_until' => $talent->contract_until?->format('Y-m-d'),
+                'market_value' => $talent->market_value,
                 'biography' => $talent->biography,
                 'career_history' => $talent->career_history ?? [],
                 'video_links' => $talent->video_links ?? [],
@@ -124,6 +135,10 @@ class TalentController extends Controller
         $data['video_links'] = $this->cleanRows($request->input('video_links'), ['label', 'url']);
         $data['gallery_images'] = array_values(array_filter($request->input('gallery_images', [])));
         $data['video_files'] = array_values(array_filter($request->input('video_files', [])));
+        $data['secondary_positions'] = array_values(array_filter(
+            array_map('trim', $request->input('secondary_positions', [])),
+            fn ($value) => $value !== '',
+        ));
 
         $talent->fill($data);
     }
@@ -151,6 +166,8 @@ class TalentController extends Controller
         return [
             'types' => Talent::TYPES,
             'statuses' => Talent::STATUSES,
+            'feet' => Talent::PREFERRED_FEET,
+            'contractStatuses' => Talent::CONTRACT_STATUSES,
         ];
     }
 }

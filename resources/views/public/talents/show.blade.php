@@ -8,6 +8,41 @@
     @php
         $photo = media_url($talent->photo);
         $gallery = collect($talent->gallery_images ?? [])->map(fn ($p) => media_url($p))->filter();
+
+        $contractLabels = [
+            'contracted' => 'Under contract',
+            'on_loan' => 'On loan',
+            'free_agent' => 'Free agent',
+            'youth' => 'Youth contract',
+        ];
+
+        // Concise highlights shown in the header.
+        $highlights = collect([
+            ['Age', $talent->age],
+            ['Position', $talent->position],
+            ['Nationality', $talent->nationality],
+            ['Preferred foot', $talent->preferred_foot ? ucfirst($talent->preferred_foot) : null],
+        ])->filter(fn ($item) => filled($item[1]));
+
+        // Full scouting sheet shown in the sidebar.
+        $details = collect([
+            ['Full name', $talent->full_name],
+            ['Date of birth', $talent->date_of_birth?->format('j M Y')],
+            ['Age', $talent->age !== null ? $talent->age.' years' : null],
+            ['Place of birth', $talent->place_of_birth],
+            ['Nationality', $talent->nationality],
+            ['Second nationality', $talent->secondary_nationality],
+            ['Height', $talent->height_cm ? $talent->height_cm.' cm' : null],
+            ['Weight', $talent->weight_kg ? $talent->weight_kg.' kg' : null],
+            ['Preferred foot', $talent->preferred_foot ? ucfirst($talent->preferred_foot) : null],
+            ['Main position', $talent->position],
+            ['Other positions', ! empty($talent->secondary_positions) ? implode(', ', $talent->secondary_positions) : null],
+            ['Shirt number', $talent->shirt_number ? '#'.$talent->shirt_number : null],
+            ['Current club', $talent->current_club],
+            ['Contract status', $talent->contract_status ? ($contractLabels[$talent->contract_status] ?? $talent->contract_status) : null],
+            ['Contract until', $talent->contract_until?->format('M Y')],
+            ['Market value', $talent->market_value],
+        ])->filter(fn ($item) => filled($item[1]));
     @endphp
 
     {{-- ============================ HEADER ============================ --}}
@@ -36,30 +71,23 @@
                     @if ($talent->position)
                         <span class="rounded-full bg-brand-500 px-3 py-1 font-condensed text-xs font-semibold uppercase tracking-wider text-ink">{{ $talent->position }}</span>
                     @endif
+                    @if ($talent->shirt_number)
+                        <span class="rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 font-condensed text-xs font-semibold uppercase tracking-wider text-gold-400">No. {{ $talent->shirt_number }}</span>
+                    @endif
                 </div>
 
                 <h1 class="mt-5 font-serif text-4xl font-semibold text-white sm:text-5xl">{{ $talent->full_name }}</h1>
 
-                <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:max-w-md">
-                    @if ($talent->current_club)
-                        <div class="bg-ink-900/60 px-5 py-4">
-                            <dt class="font-condensed text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-mist-faint">Current Club</dt>
-                            <dd class="mt-1 text-sm text-white">{{ $talent->current_club }}</dd>
-                        </div>
-                    @endif
-                    @if ($talent->nationality)
-                        <div class="bg-ink-900/60 px-5 py-4">
-                            <dt class="font-condensed text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-mist-faint">Nationality</dt>
-                            <dd class="mt-1 text-sm text-white">{{ $talent->nationality }}</dd>
-                        </div>
-                    @endif
-                    @if ($talent->position)
-                        <div class="bg-ink-900/60 px-5 py-4">
-                            <dt class="font-condensed text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-mist-faint">Position</dt>
-                            <dd class="mt-1 text-sm text-white">{{ $talent->position }}</dd>
-                        </div>
-                    @endif
-                </dl>
+                @if ($highlights->isNotEmpty())
+                    <dl class="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:grid-cols-4">
+                        @foreach ($highlights as [$label, $value])
+                            <div class="bg-ink-900/60 px-5 py-4">
+                                <dt class="font-condensed text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-mist-faint">{{ $label }}</dt>
+                                <dd class="mt-1 text-sm text-white">{{ $value }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                @endif
 
                 <div class="mt-8">
                     <a href="{{ route('contact') }}" class="btn btn-gold">Enquire about {{ \Illuminate\Support\Str::before($talent->full_name, ' ') }}</a>
@@ -123,8 +151,22 @@
             @endif
         </div>
 
-        {{-- Career history --}}
-        <aside>
+        {{-- Vital statistics + career history --}}
+        <aside class="space-y-6">
+            @if ($details->isNotEmpty())
+                <div class="surface p-6">
+                    <h2 class="font-condensed text-sm font-semibold uppercase tracking-[0.28em] text-brand-400">Player details</h2>
+                    <dl class="mt-5 divide-y divide-white/10">
+                        @foreach ($details as [$label, $value])
+                            <div class="flex items-start justify-between gap-4 py-2.5">
+                                <dt class="text-sm text-mist-dim">{{ $label }}</dt>
+                                <dd class="text-right text-sm font-medium text-white">{{ $value }}</dd>
+                            </div>
+                        @endforeach
+                    </dl>
+                </div>
+            @endif
+
             @if (! empty($talent->career_history))
                 <div class="surface p-6">
                     <h2 class="font-condensed text-sm font-semibold uppercase tracking-[0.28em] text-brand-400">Career</h2>

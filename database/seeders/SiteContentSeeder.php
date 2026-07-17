@@ -95,7 +95,11 @@ class SiteContentSeeder extends Seeder
         $roster = [
             [
                 'type' => 'player', 'full_name' => 'Marcus Adeyemi', 'position' => 'LW / AM',
-                'nationality' => 'England', 'current_club' => 'Riverside United', 'is_featured' => true, 'seed' => 'adeyemi',
+                'nationality' => 'England', 'secondary_nationality' => 'Nigeria', 'current_club' => 'Riverside United',
+                'is_featured' => true, 'seed' => 'adeyemi',
+                'shirt' => 11, 'secondary_positions' => ['RW', 'ST'], 'dob' => '2004-03-18', 'place_of_birth' => 'London, England',
+                'height' => 180, 'weight' => 74, 'foot' => 'right', 'contract_status' => 'contracted',
+                'contract_until' => '2028-06-30', 'market_value' => '€4.5M',
                 'biography' => 'A dynamic attacking talent with an eye for the decisive moment, Marcus combines pace, '
                     .'close control, and a maturity beyond his years. Comfortable operating off either flank or through '
                     .'the middle, he has established himself as one of the most exciting prospects in the division.',
@@ -104,6 +108,9 @@ class SiteContentSeeder extends Seeder
             [
                 'type' => 'player', 'full_name' => 'Diego Fontana', 'position' => 'CB',
                 'nationality' => 'Italy', 'current_club' => 'AC Meridian', 'is_featured' => true, 'seed' => 'fontana',
+                'shirt' => 4, 'secondary_positions' => ['RB'], 'dob' => '2003-11-02', 'place_of_birth' => 'Turin, Italy',
+                'height' => 189, 'weight' => 82, 'foot' => 'right', 'contract_status' => 'contracted',
+                'contract_until' => '2027-06-30', 'market_value' => '€6M',
                 'biography' => 'A commanding central defender who reads the game superbly, Diego brings composure, '
                     .'aerial dominance, and a calm presence in possession. His leadership on the pitch belies his age '
                     .'and marks him out as a future captain.',
@@ -156,14 +163,31 @@ class SiteContentSeeder extends Seeder
 
         $models = [];
         foreach ($roster as $i => $r) {
+            $isPlayer = $r['type'] === 'player';
+
             $models[] = Talent::create([
                 'type' => $r['type'],
                 'full_name' => $r['full_name'],
                 'slug' => Str::slug($r['full_name']),
                 'photo' => $this->img($r['seed']),
                 'position' => $r['position'],
+                'shirt_number' => $isPlayer ? ($r['shirt'] ?? (($i * 7) % 28) + 2) : null,
+                'secondary_positions' => $r['secondary_positions'] ?? [],
                 'nationality' => $r['nationality'],
+                'secondary_nationality' => $r['second_nationality'] ?? null,
+                'date_of_birth' => $isPlayer
+                    ? ($r['dob'] ?? now()->subYears(18 + ($i % 9))->subDays(($i * 37) % 300)->format('Y-m-d'))
+                    : null,
+                'place_of_birth' => $r['place_of_birth'] ?? null,
+                'height_cm' => $isPlayer ? ($r['height'] ?? 172 + (($i * 5) % 22)) : null,
+                'weight_kg' => $isPlayer ? ($r['weight'] ?? 66 + (($i * 3) % 16)) : null,
+                'preferred_foot' => $isPlayer ? ($r['foot'] ?? ($i % 4 === 0 ? 'left' : 'right')) : null,
                 'current_club' => $r['current_club'],
+                'contract_status' => $isPlayer ? ($r['contract_status'] ?? 'contracted') : null,
+                'contract_until' => $isPlayer
+                    ? ($r['contract_until'] ?? now()->addYears(2 + ($i % 3))->format('Y-m-d'))
+                    : null,
+                'market_value' => $r['market_value'] ?? null,
                 'biography' => $r['biography'],
                 'career_history' => $r['career'],
                 'video_links' => [

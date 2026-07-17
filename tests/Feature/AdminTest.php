@@ -80,6 +80,46 @@ it('updates a talent', function () {
         ->type->toBe('coach');
 });
 
+it('saves scouting details and derives age from the date of birth', function () {
+    actingAs($this->user)->post('/admin/talents', [
+        'type' => 'player',
+        'full_name' => 'Scout Target',
+        'status' => 'published',
+        'position' => 'CB',
+        'shirt_number' => '4',
+        'secondary_positions' => ['RB', '', ' DM '],
+        'nationality' => 'Italy',
+        'secondary_nationality' => 'Argentina',
+        'date_of_birth' => now()->subYears(21)->subDays(10)->format('Y-m-d'),
+        'place_of_birth' => 'Turin, Italy',
+        'height_cm' => '189',
+        'weight_kg' => '82',
+        'preferred_foot' => 'right',
+        'current_club' => 'AC Meridian',
+        'contract_status' => 'contracted',
+        'contract_until' => now()->addYears(3)->format('Y-m-d'),
+        'market_value' => '€6M',
+    ])->assertRedirect('/admin/talents');
+
+    $talent = Talent::firstWhere('full_name', 'Scout Target');
+
+    expect($talent->age)->toBe(21)
+        ->and($talent->height_cm)->toBe(189)
+        ->and($talent->shirt_number)->toBe(4)
+        ->and($talent->preferred_foot)->toBe('right')
+        ->and($talent->contract_status)->toBe('contracted')
+        ->and($talent->secondary_positions)->toBe(['RB', 'DM']); // blanks dropped, values trimmed
+});
+
+it('rejects an invalid preferred foot', function () {
+    actingAs($this->user)->post('/admin/talents', [
+        'type' => 'player',
+        'full_name' => 'Bad Foot',
+        'status' => 'draft',
+        'preferred_foot' => 'sideways',
+    ])->assertSessionHasErrors('preferred_foot');
+});
+
 it('toggles featured', function () {
     $talent = Talent::factory()->create(['is_featured' => false]);
 
