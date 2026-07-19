@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Link2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { AdminPage, PageHeader } from '@/components/admin/layout';
+import { copyToClipboard } from '@/components/file-manager/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -11,6 +12,7 @@ type Article = {
     status: string;
     published_at: string | null;
     image_url: string | null;
+    public_url: string;
 };
 
 export default function NewsIndex({ articles }: { articles: Article[] }) {
@@ -69,6 +71,14 @@ export default function NewsIndex({ articles }: { articles: Article[] }) {
                                     <td className="hidden p-3 sm:table-cell">{row.published_at ?? '—'}</td>
                                     <td className="p-3">
                                         <div className="flex justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => copyToClipboard(row.public_url)}
+                                                aria-label="Copy shareable link"
+                                            >
+                                                <Link2 className="size-4" />
+                                            </Button>
                                             <Button asChild variant="ghost" size="icon">
                                                 <Link href={`/admin/news/${row.id}/edit`} aria-label="Edit">
                                                     <Pencil className="size-4" />

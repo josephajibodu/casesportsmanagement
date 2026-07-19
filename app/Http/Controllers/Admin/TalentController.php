@@ -31,6 +31,7 @@ class TalentController extends Controller
                 'photo_url' => media_url($t->photo),
                 'is_featured' => $t->is_featured,
                 'status' => $t->status,
+                'public_url' => $t->publicUrl(),
             ]);
 
         return Inertia::render('admin/talents/index', [

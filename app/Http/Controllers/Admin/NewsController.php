@@ -28,6 +28,7 @@ class NewsController extends Controller
                 'status' => $a->status,
                 'published_at' => $a->published_at?->toDateString(),
                 'image_url' => media_url($a->featured_image),
+                'public_url' => route('news.show', $a),
             ]);
 
         return Inertia::render('admin/news/index', [

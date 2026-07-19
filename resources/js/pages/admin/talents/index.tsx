@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Pencil, Plus, Star, Trash2 } from 'lucide-react';
+import { Link2, Pencil, Plus, Star, Trash2 } from 'lucide-react';
 import { AdminPage, PageHeader } from '@/components/admin/layout';
+import { copyToClipboard } from '@/components/file-manager/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -13,6 +14,7 @@ type TalentRow = {
     photo_url: string | null;
     is_featured: boolean;
     status: string;
+    public_url: string;
 };
 
 export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
@@ -98,6 +100,14 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
                                     </td>
                                     <td className="p-3">
                                         <div className="flex justify-end gap-1">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                onClick={() => copyToClipboard(row.public_url)}
+                                                aria-label="Copy shareable link"
+                                            >
+                                                <Link2 className="size-4" />
+                                            </Button>
                                             <Button asChild variant="ghost" size="icon">
                                                 <Link href={`/admin/talents/${row.id}/edit`} aria-label="Edit">
                                                     <Pencil className="size-4" />
