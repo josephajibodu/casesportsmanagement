@@ -13,11 +13,8 @@
 
 <header class="sticky top-0 z-40 border-b border-white/10 bg-ink/80 backdrop-blur-md">
     <nav class="shell flex h-18 items-center justify-between gap-6">
-        <a href="{{ route('home') }}" class="flex items-center gap-3" aria-label="{{ $settings->agency_name }} home">
-            <x-brand-mark class="h-9 w-9" />
-            <span class="hidden font-serif text-lg font-semibold tracking-tight text-white sm:block">
-                CaSe <span class="text-gold-400">Sports</span>
-            </span>
+        <a href="{{ route('home') }}" class="flex items-center" aria-label="{{ $settings->agency_name }} home">
+            <x-brand-mark class="h-12 w-auto sm:h-14" />
         </a>
 
         <div class="hidden items-center gap-8 lg:flex">

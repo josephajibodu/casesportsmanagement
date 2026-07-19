@@ -2,7 +2,7 @@
 
 @section('title', $talent->meta_title ?: $talent->full_name)
 @section('meta_description', $talent->meta_description ?: \Illuminate\Support\Str::limit(strip_tags($talent->biography ?? ''), 155))
-@section('og_image', media_url($talent->photo) ?? asset('favicon.svg'))
+@section('og_image', media_url($talent->photo) ?? asset('images/logo.png'))
 
 @section('content')
     @php

@@ -6,11 +6,8 @@
 <footer class="relative mt-8 border-t border-white/10 bg-ink-950">
     <div class="shell grid gap-12 py-16 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
-            <a href="{{ route('home') }}" class="flex items-center gap-3">
-                <x-brand-mark class="h-10 w-10" />
-                <span class="font-serif text-xl font-semibold tracking-tight text-white">
-                    CaSe <span class="text-gold-400">Sports</span>
-                </span>
+            <a href="{{ route('home') }}" class="inline-flex items-center" aria-label="{{ $settings->agency_name }} home">
+                <x-brand-mark class="h-14 w-auto" />
             </a>
             <p class="mt-5 max-w-sm text-sm leading-relaxed text-mist-dim">
                 {{ $settings->tagline ?: 'Elite football representation with a personal touch.' }}

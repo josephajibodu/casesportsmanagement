@@ -2,7 +2,7 @@
 
 @section('title', $article->meta_title ?: $article->title)
 @section('meta_description', $article->meta_description ?: $article->excerpt)
-@section('og_image', media_url($article->featured_image) ?? asset('favicon.svg'))
+@section('og_image', media_url($article->featured_image) ?? asset('images/logo.png'))
 
 @section('content')
     @php $image = media_url($article->featured_image); @endphp

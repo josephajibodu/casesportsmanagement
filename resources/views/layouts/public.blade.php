@@ -10,7 +10,7 @@
                 ? $settings->agency_name.' | FIFA-Licensed Football Agency'
                 : $metaTitle.' | '.$settings->agency_name;
             $metaDescription = trim($__env->yieldContent('meta_description', $settings->tagline ?? ''));
-            $ogImage = $__env->yieldContent('og_image', asset('favicon.svg'));
+            $ogImage = $__env->yieldContent('og_image', asset('images/logo.png'));
         @endphp
 
         <title>{{ $pageTitle }}</title>
@@ -26,9 +26,8 @@
         <meta property="og:image" content="{{ $ogImage }}">
         <meta name="twitter:card" content="summary_large_image">
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+        <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
         @php
             Illuminate\Support\Facades\Vite::useBuildDirectory('build-static')
