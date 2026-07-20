@@ -96,6 +96,20 @@ class NewsController extends Controller
         return to_route('admin.news.index');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:news_articles,id'],
+        ])['ids'];
+
+        $count = NewsArticle::whereIn('id', $ids)->delete();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $count === 1 ? 'Article deleted.' : "{$count} articles deleted."]);
+
+        return to_route('admin.news.index');
+    }
+
     protected function fill(NewsArticle $article, NewsArticleRequest $request): void
     {
         $data = $request->safe()->all();

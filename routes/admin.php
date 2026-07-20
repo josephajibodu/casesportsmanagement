@@ -20,8 +20,10 @@ Route::middleware(['auth', 'verified'])
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
         Route::patch('talents/{talent}/featured', [TalentController::class, 'toggleFeatured'])->name('talents.featured');
+        Route::delete('talents/bulk-destroy', [TalentController::class, 'bulkDestroy'])->name('talents.bulk-destroy');
         Route::resource('talents', TalentController::class)->except('show');
 
+        Route::delete('news/bulk-destroy', [NewsController::class, 'bulkDestroy'])->name('news.bulk-destroy');
         Route::resource('news', NewsController::class)->except('show');
 
         Route::post('team/reorder', [TeamMemberController::class, 'reorder'])->name('team.reorder');
@@ -33,6 +35,7 @@ Route::middleware(['auth', 'verified'])
         Route::resource('media', MediaItemController::class)->except('show')->parameters(['media' => 'mediaItem']);
 
         Route::get('enquiries', [ContactSubmissionController::class, 'index'])->name('enquiries.index');
+        Route::delete('enquiries/bulk-destroy', [ContactSubmissionController::class, 'bulkDestroy'])->name('enquiries.bulk-destroy');
         Route::get('enquiries/{submission}', [ContactSubmissionController::class, 'show'])->name('enquiries.show');
         Route::patch('enquiries/{submission}', [ContactSubmissionController::class, 'update'])->name('enquiries.update');
         Route::delete('enquiries/{submission}', [ContactSubmissionController::class, 'destroy'])->name('enquiries.destroy');

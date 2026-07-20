@@ -80,4 +80,18 @@ class ContactSubmissionController extends Controller
 
         return to_route('admin.enquiries.index');
     }
+
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:contact_submissions,id'],
+        ])['ids'];
+
+        $count = ContactSubmission::whereIn('id', $ids)->delete();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $count === 1 ? 'Enquiry deleted.' : "{$count} enquiries deleted."]);
+
+        return to_route('admin.enquiries.index');
+    }
 }

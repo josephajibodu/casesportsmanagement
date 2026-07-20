@@ -4,6 +4,8 @@ import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { copyToClipboard } from '@/components/file-manager/share-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { useRowSelection } from '@/hooks/use-row-selection';
 
 type TalentRow = {
     id: number;
@@ -18,9 +20,27 @@ type TalentRow = {
 };
 
 export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
+    const { selected, toggle, toggleAll, clear, isAllSelected, isIndeterminate } = useRowSelection(talents);
+
     function destroy(row: TalentRow) {
         if (confirm(`Delete ${row.full_name}? This cannot be undone.`)) {
             router.delete(`/admin/talents/${row.id}`, { preserveScroll: true });
+        }
+    }
+
+    function bulkDestroy() {
+        const ids = Array.from(selected);
+
+        if (ids.length === 0) {
+            return;
+        }
+
+        if (confirm(`Delete ${ids.length} selected profile${ids.length === 1 ? '' : 's'}? This cannot be undone.`)) {
+            router.delete('/admin/talents/bulk-destroy', {
+                data: { ids },
+                preserveScroll: true,
+                onSuccess: () => clear(),
+            });
         }
     }
 
@@ -34,17 +54,31 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
 
             <AdminPage>
                 <PageHeader title="Players & Coaches" description="Manage represented talent">
-                    <Button asChild>
-                        <Link href="/admin/talents/create">
-                            <Plus className="size-4" /> Add profile
-                        </Link>
-                    </Button>
+                    <div className="flex items-center gap-2">
+                        {selected.size > 0 && (
+                            <Button variant="destructive" size="sm" onClick={bulkDestroy}>
+                                <Trash2 className="size-4" /> Delete selected ({selected.size})
+                            </Button>
+                        )}
+                        <Button asChild>
+                            <Link href="/admin/talents/create">
+                                <Plus className="size-4" /> Add profile
+                            </Link>
+                        </Button>
+                    </div>
                 </PageHeader>
 
                 <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
                     <table className="w-full text-sm">
                         <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                             <tr>
+                                <th className="w-10 p-3">
+                                    <Checkbox
+                                        checked={isIndeterminate ? 'indeterminate' : isAllSelected}
+                                        onCheckedChange={toggleAll}
+                                        aria-label="Select all"
+                                    />
+                                </th>
                                 <th className="p-3 font-medium">Name</th>
                                 <th className="p-3 font-medium">Type</th>
                                 <th className="hidden p-3 font-medium sm:table-cell">Position</th>
@@ -56,13 +90,20 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
                         <tbody className="divide-y">
                             {talents.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
                                         No profiles yet. Add your first player or coach.
                                     </td>
                                 </tr>
                             )}
                             {talents.map((row) => (
                                 <tr key={row.id} className="hover:bg-accent/30">
+                                    <td className="p-3">
+                                        <Checkbox
+                                            checked={selected.has(row.id)}
+                                            onCheckedChange={() => toggle(row.id)}
+                                            aria-label={`Select ${row.full_name}`}
+                                        />
+                                    </td>
                                     <td className="p-3">
                                         <div className="flex items-center gap-3">
                                             <div className="size-9 shrink-0 overflow-hidden rounded-full bg-muted">

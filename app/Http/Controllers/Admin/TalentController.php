@@ -119,6 +119,20 @@ class TalentController extends Controller
         return to_route('admin.talents.index');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:talents,id'],
+        ])['ids'];
+
+        $count = Talent::whereIn('id', $ids)->delete();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $count === 1 ? 'Profile deleted.' : "{$count} profiles deleted."]);
+
+        return to_route('admin.talents.index');
+    }
+
     public function toggleFeatured(Talent $talent): RedirectResponse
     {
         $talent->update(['is_featured' => ! $talent->is_featured]);

@@ -138,6 +138,18 @@ it('deletes a talent but keeps its media in the library', function () {
     Storage::disk('public')->assertExists($path);
 });
 
+it('bulk deletes talents', function () {
+    $keep = Talent::factory()->create();
+    $delete = Talent::factory()->count(2)->create();
+
+    actingAs($this->user)->delete('/admin/talents/bulk-destroy', [
+        'ids' => $delete->pluck('id')->all(),
+    ])->assertRedirect('/admin/talents');
+
+    expect(Talent::find($keep->id))->not->toBeNull()
+        ->and(Talent::whereIn('id', $delete->pluck('id'))->count())->toBe(0);
+});
+
 it('creates a news article and auto-sets publish date', function () {
     actingAs($this->user)->post('/admin/news', [
         'title' => 'Big Announcement',
@@ -150,6 +162,18 @@ it('creates a news article and auto-sets publish date', function () {
     expect($article)->not->toBeNull()
         ->and($article->published_at)->not->toBeNull()
         ->and($article->slug)->toBe('big-announcement');
+});
+
+it('bulk deletes news articles', function () {
+    $keep = NewsArticle::factory()->create();
+    $delete = NewsArticle::factory()->count(2)->create();
+
+    actingAs($this->user)->delete('/admin/news/bulk-destroy', [
+        'ids' => $delete->pluck('id')->all(),
+    ])->assertRedirect('/admin/news');
+
+    expect(NewsArticle::find($keep->id))->not->toBeNull()
+        ->and(NewsArticle::whereIn('id', $delete->pluck('id'))->count())->toBe(0);
 });
 
 it('creates a team member', function () {
@@ -205,6 +229,26 @@ it('deletes an enquiry', function () {
     actingAs($this->user)->delete("/admin/enquiries/{$submission->id}")->assertRedirect('/admin/enquiries');
 
     expect(ContactSubmission::find($submission->id))->toBeNull();
+});
+
+it('bulk deletes enquiries', function () {
+    $keep = ContactSubmission::create(['name' => 'Keep', 'email' => 'k@example.com', 'message' => 'Hi.']);
+    $delete = collect([
+        ContactSubmission::create(['name' => 'A', 'email' => 'a@example.com', 'message' => 'Hi.']),
+        ContactSubmission::create(['name' => 'B', 'email' => 'b@example.com', 'message' => 'Hi.']),
+    ]);
+
+    actingAs($this->user)->delete('/admin/enquiries/bulk-destroy', [
+        'ids' => $delete->pluck('id')->all(),
+    ])->assertRedirect('/admin/enquiries');
+
+    expect(ContactSubmission::find($keep->id))->not->toBeNull()
+        ->and(ContactSubmission::whereIn('id', $delete->pluck('id'))->count())->toBe(0);
+});
+
+it('rejects bulk delete with no ids', function () {
+    actingAs($this->user)->delete('/admin/talents/bulk-destroy', ['ids' => []])
+        ->assertSessionHasErrors('ids');
 });
 
 it('updates site settings including json fields', function () {
