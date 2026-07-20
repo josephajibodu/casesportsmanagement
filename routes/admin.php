@@ -32,6 +32,7 @@ Route::middleware(['auth', 'verified'])
         Route::post('partners/reorder', [PartnerController::class, 'reorder'])->name('partners.reorder');
         Route::resource('partners', PartnerController::class)->except('show');
 
+        Route::delete('media/bulk-destroy', [MediaItemController::class, 'bulkDestroy'])->name('media.bulk-destroy');
         Route::resource('media', MediaItemController::class)->except('show')->parameters(['media' => 'mediaItem']);
 
         Route::get('enquiries', [ContactSubmissionController::class, 'index'])->name('enquiries.index');

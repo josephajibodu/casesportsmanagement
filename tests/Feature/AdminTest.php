@@ -204,6 +204,18 @@ it('creates an image media item', function () {
     expect(MediaItem::where('caption', 'A moment')->exists())->toBeTrue();
 });
 
+it('bulk deletes media items', function () {
+    $keep = MediaItem::factory()->create();
+    $delete = MediaItem::factory()->count(2)->create();
+
+    actingAs($this->user)->delete('/admin/media/bulk-destroy', [
+        'ids' => $delete->pluck('id')->all(),
+    ])->assertRedirect('/admin/media');
+
+    expect(MediaItem::find($keep->id))->not->toBeNull()
+        ->and(MediaItem::whereIn('id', $delete->pluck('id'))->count())->toBe(0);
+});
+
 it('requires a video url for a video media item', function () {
     actingAs($this->user)->post('/admin/media', [
         'media_type' => 'video',

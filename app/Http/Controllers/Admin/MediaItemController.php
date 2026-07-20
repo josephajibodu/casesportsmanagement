@@ -96,6 +96,20 @@ class MediaItemController extends Controller
         return to_route('admin.media.index');
     }
 
+    public function bulkDestroy(Request $request): RedirectResponse
+    {
+        $ids = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'exists:media_items,id'],
+        ])['ids'];
+
+        $count = MediaItem::whereIn('id', $ids)->delete();
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $count === 1 ? 'Media item deleted.' : "{$count} media items deleted."]);
+
+        return to_route('admin.media.index');
+    }
+
     protected function fill(MediaItem $item, Request $request): void
     {
         $data = $request->validate([
