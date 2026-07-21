@@ -33,6 +33,7 @@ class SiteSettingController extends Controller
                 'services' => $settings->services ?? [],
                 'stats' => $settings->stats ?? [],
                 'social_links' => $settings->social_links ?? [],
+                'registration_enabled' => $settings->registration_enabled,
             ],
             'socialKeys' => ['instagram', 'twitter', 'facebook', 'linkedin'],
         ]);
@@ -66,6 +67,8 @@ class SiteSettingController extends Controller
 
             'social_links' => ['nullable', 'array'],
             'social_links.*' => ['nullable', 'string', 'max:255'],
+
+            'registration_enabled' => ['boolean'],
         ]);
 
         $data['services'] = collect($data['services'] ?? [])

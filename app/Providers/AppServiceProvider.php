@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Http\Middleware\EnsureRegistrationIsEnabled;
 use App\Models\SiteSetting;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +30,25 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->shareSiteSettings();
+        $this->gateRegistrationRoutes();
+    }
+
+    /**
+     * Fortify registers /register itself with no runtime toggle, so gate it here
+     * once every provider (including Fortify's) has finished registering routes.
+     */
+    protected function gateRegistrationRoutes(): void
+    {
+        $this->app->booted(function () {
+            // Named-route lookups aren't refreshed yet at this point (Laravel's own
+            // route-loading is itself deferred to a later "booted" callback), so
+            // match on the route's name directly instead of Route::getRoutes()->getByName().
+            foreach (Route::getRoutes()->getRoutes() as $route) {
+                if (in_array($route->getName(), ['register', 'register.store'], true)) {
+                    $route->middleware(EnsureRegistrationIsEnabled::class);
+                }
+            }
+        });
     }
 
     /**

@@ -2,7 +2,9 @@ import { Head, useForm } from '@inertiajs/react';
 import { AdminPage, Field, FormActions, FormSection, PageHeader } from '@/components/admin/layout';
 import { Repeater } from '@/components/admin/repeater';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
 type Row = Record<string, string>;
@@ -24,6 +26,7 @@ type Settings = {
     services: Row[];
     stats: Row[];
     social_links: Record<string, string>;
+    registration_enabled: boolean;
 };
 
 export default function SiteSettings({
@@ -50,6 +53,7 @@ export default function SiteSettings({
         services: Row[];
         stats: Row[];
         social_links: Record<string, string>;
+        registration_enabled: boolean;
     }>({
         agency_name: settings.agency_name ?? '',
         tagline: settings.tagline ?? '',
@@ -70,6 +74,7 @@ export default function SiteSettings({
             acc[key] = settings.social_links?.[key] ?? '';
             return acc;
         }, {}),
+        registration_enabled: settings.registration_enabled ?? false,
     });
 
     const { data, setData, errors, processing } = form;
@@ -176,6 +181,23 @@ export default function SiteSettings({
                                 ]}
                                 addLabel="Add stat"
                             />
+                        </FormSection>
+
+                        <FormSection title="Security" description="Control who can create an account.">
+                            <div className="flex items-start gap-3">
+                                <Checkbox
+                                    id="registration_enabled"
+                                    checked={data.registration_enabled}
+                                    onCheckedChange={(checked) => setData('registration_enabled', checked === true)}
+                                />
+                                <div className="grid gap-1">
+                                    <Label htmlFor="registration_enabled">Allow new admin registration</Label>
+                                    <p className="text-sm text-muted-foreground">
+                                        When off, the public sign-up page is disabled. Existing admins can still create new admin accounts
+                                        from the Admins page.
+                                    </p>
+                                </div>
+                            </div>
                         </FormSection>
                     </div>
 

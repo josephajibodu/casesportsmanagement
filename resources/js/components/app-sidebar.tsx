@@ -9,6 +9,7 @@ import {
     Handshake,
     Mail,
     Settings2,
+    ShieldCheck,
     Globe,
 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
@@ -35,6 +36,7 @@ const mainNavItems: NavItem[] = [
     { title: 'Partners', href: '/admin/partners', icon: Handshake },
     { title: 'Files', href: '/admin/files', icon: FolderOpen },
     { title: 'Enquiries', href: '/admin/enquiries', icon: Mail },
+    { title: 'Admins', href: '/admin/admins', icon: ShieldCheck },
     { title: 'Site Settings', href: '/admin/site-settings', icon: Settings2 },
 ];
 

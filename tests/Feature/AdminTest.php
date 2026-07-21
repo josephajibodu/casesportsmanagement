@@ -10,6 +10,7 @@ use App\Models\TeamMember;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Support\SessionKey;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\get;
@@ -38,6 +39,7 @@ it('renders each admin index', function (string $path) {
     '/admin/files',
     '/admin/enquiries',
     '/admin/site-settings',
+    '/admin/admins',
 ]);
 
 it('creates a talent with media chosen from the file manager', function () {
@@ -263,6 +265,88 @@ it('rejects bulk delete with no ids', function () {
         ->assertSessionHasErrors('ids');
 });
 
+it('creates an admin and generates a one-time password', function () {
+    actingAs($this->user)->post('/admin/admins', [
+        'name' => 'New Admin',
+        'email' => 'new-admin@example.com',
+    ])->assertRedirect('/admin/admins')
+        ->assertSessionHas(
+            SessionKey::FLASH_DATA,
+            fn ($flash) => ($flash['generatedAdmin']['email'] ?? null) === 'new-admin@example.com'
+                && filled($flash['generatedAdmin']['password'] ?? null),
+        );
+
+    $admin = User::firstWhere('email', 'new-admin@example.com');
+
+    expect($admin)->not->toBeNull()
+        ->and($admin->name)->toBe('New Admin');
+});
+
+it('rejects a duplicate admin email', function () {
+    actingAs($this->user)->post('/admin/admins', [
+        'name' => 'Duplicate',
+        'email' => $this->user->email,
+    ])->assertSessionHasErrors('email');
+});
+
+it('updates an admin name and email', function () {
+    $admin = User::factory()->create();
+
+    actingAs($this->user)->put("/admin/admins/{$admin->id}", [
+        'name' => 'Updated Name',
+        'email' => 'updated@example.com',
+    ])->assertRedirect('/admin/admins');
+
+    expect($admin->fresh())->name->toBe('Updated Name')->email->toBe('updated@example.com');
+});
+
+it('resets an admin password', function () {
+    $admin = User::factory()->create();
+    $originalHash = $admin->password;
+
+    actingAs($this->user)->post("/admin/admins/{$admin->id}/reset-password")
+        ->assertSessionHas(
+            SessionKey::FLASH_DATA,
+            fn ($flash) => ($flash['generatedAdmin']['email'] ?? null) === $admin->email,
+        );
+
+    expect($admin->fresh()->password)->not->toBe($originalHash);
+});
+
+it('prevents deleting the last remaining admin', function () {
+    actingAs($this->user)->delete("/admin/admins/{$this->user->id}")->assertRedirect();
+
+    expect(User::find($this->user->id))->not->toBeNull();
+});
+
+it('prevents deleting your own account when other admins exist', function () {
+    User::factory()->create();
+
+    actingAs($this->user)->delete("/admin/admins/{$this->user->id}")->assertRedirect();
+
+    expect(User::find($this->user->id))->not->toBeNull();
+});
+
+it('deletes another admin', function () {
+    $admin = User::factory()->create();
+
+    actingAs($this->user)->delete("/admin/admins/{$admin->id}")->assertRedirect('/admin/admins');
+
+    expect(User::find($admin->id))->toBeNull();
+});
+
+it('redirects away from registration when disabled', function () {
+    SiteSetting::current()->update(['registration_enabled' => false]);
+
+    get('/register')->assertRedirect('/login');
+});
+
+it('allows registration when enabled', function () {
+    SiteSetting::current()->update(['registration_enabled' => true]);
+
+    get('/register')->assertOk();
+});
+
 it('updates site settings including json fields', function () {
     SiteSetting::current();
 
@@ -276,6 +360,7 @@ it('updates site settings including json fields', function () {
         'services' => [['group' => '', 'title' => 'Rep', 'description' => 'desc'], ['group' => '', 'title' => '', 'description' => '']],
         'stats' => [['value' => '10+', 'label' => 'Players']],
         'social_links' => ['instagram' => 'https://insta.com/x', 'twitter' => ''],
+        'registration_enabled' => true,
     ])->assertRedirect('/admin/site-settings');
 
     $settings = SiteSetting::current();
@@ -285,5 +370,6 @@ it('updates site settings including json fields', function () {
         ->and($settings->country)->toBe('Cameroon')
         ->and($settings->formatted_address)->toBe('Mile 2, Limbe, Fako, Cameroon')
         ->and($settings->services)->toHaveCount(1) // empty row dropped
-        ->and($settings->social_links)->toBe(['instagram' => 'https://insta.com/x']); // empty dropped
+        ->and($settings->social_links)->toBe(['instagram' => 'https://insta.com/x']) // empty dropped
+        ->and($settings->registration_enabled)->toBeTrue();
 });

@@ -1,9 +1,12 @@
 <?php
 
+use App\Models\SiteSetting;
 use Laravel\Fortify\Features;
 
 beforeEach(function () {
     $this->skipUnlessFortifyHas(Features::registration());
+
+    SiteSetting::current()->update(['registration_enabled' => true]);
 });
 
 test('registration screen can be rendered', function () {

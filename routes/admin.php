@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\ContactSubmissionController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FileManagerController;
@@ -43,6 +44,9 @@ Route::middleware(['auth', 'verified'])
 
         Route::get('site-settings', [SiteSettingController::class, 'edit'])->name('site-settings.edit');
         Route::put('site-settings', [SiteSettingController::class, 'update'])->name('site-settings.update');
+
+        Route::post('admins/{admin}/reset-password', [AdminUserController::class, 'resetPassword'])->name('admins.reset-password');
+        Route::resource('admins', AdminUserController::class)->except('show');
 
         /*
         | File Manager: the single upload/selection surface for the admin.

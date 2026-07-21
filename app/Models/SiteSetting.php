@@ -23,12 +23,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $province
  * @property string|null $country
  * @property array<string, string>|null $social_links
+ * @property bool $registration_enabled
  */
 #[Fillable([
     'agency_name', 'tagline', 'agency_story', 'mission', 'vision',
     'fifa_license_info', 'services', 'stats', 'email', 'phone',
     'address_line1', 'address_line2', 'city', 'province', 'country',
-    'social_links',
+    'social_links', 'registration_enabled',
 ])]
 class SiteSetting extends Model
 {
@@ -41,6 +42,7 @@ class SiteSetting extends Model
             'services' => 'array',
             'stats' => 'array',
             'social_links' => 'array',
+            'registration_enabled' => 'boolean',
         ];
     }
 
