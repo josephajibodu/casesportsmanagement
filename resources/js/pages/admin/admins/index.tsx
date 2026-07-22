@@ -1,6 +1,6 @@
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Copy, KeyRound, Pencil, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AdminPage, PageHeader } from '@/components/admin/layout';
 import { copyToClipboard } from '@/components/file-manager/share-dialog';
 import { Button } from '@/components/ui/button';
@@ -23,8 +23,20 @@ type GeneratedAdmin = {
 };
 
 export default function AdminsIndex({ admins }: { admins: Admin[] }) {
-    const { props } = usePage<{ auth: { user: { id: number } }; flash?: { generatedAdmin?: GeneratedAdmin } }>();
-    const [credentials, setCredentials] = useState<GeneratedAdmin | null>(props.flash?.generatedAdmin ?? null);
+    const { props } = usePage<{ auth: { user: { id: number } } }>();
+    const [credentials, setCredentials] = useState<GeneratedAdmin | null>(null);
+
+    // Inertia delivers flash data as a top-level page field (not a prop), surfaced
+    // via this router event — the same mechanism useFlashToast uses for toasts.
+    useEffect(() => {
+        return router.on('flash', (event) => {
+            const flash = (event as CustomEvent).detail?.flash as { generatedAdmin?: GeneratedAdmin } | undefined;
+
+            if (flash?.generatedAdmin) {
+                setCredentials(flash.generatedAdmin);
+            }
+        });
+    }, []);
 
     function destroy(row: Admin) {
         if (confirm(`Delete ${row.name}? This cannot be undone.`)) {
