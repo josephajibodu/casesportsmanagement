@@ -225,14 +225,43 @@ it('requires a video url for a video media item', function () {
     ])->assertSessionHasErrors('video_url');
 });
 
-it('marks an enquiry handled when opened', function () {
+it('does not mark an enquiry handled just by opening it', function () {
     $submission = ContactSubmission::create([
         'name' => 'Scout', 'email' => 's@example.com', 'message' => 'Interested.', 'status' => 'new',
     ]);
 
     actingAs($this->user)->get("/admin/enquiries/{$submission->id}")->assertOk();
 
-    expect($submission->fresh()->status)->toBe('handled');
+    expect($submission->fresh()->status)->toBe('new');
+});
+
+it('records who marked an enquiry handled', function () {
+    $submission = ContactSubmission::create([
+        'name' => 'Scout', 'email' => 's@example.com', 'message' => 'Interested.', 'status' => 'new',
+    ]);
+
+    actingAs($this->user)->patch("/admin/enquiries/{$submission->id}", ['status' => 'handled'])->assertRedirect();
+
+    $submission->refresh();
+
+    expect($submission->status)->toBe('handled')
+        ->and($submission->handled_by)->toBe($this->user->id)
+        ->and($submission->handled_at)->not->toBeNull();
+});
+
+it('clears handled_by when an enquiry is marked new again', function () {
+    $submission = ContactSubmission::create([
+        'name' => 'Scout', 'email' => 's@example.com', 'message' => 'Interested.', 'status' => 'handled',
+    ]);
+    $submission->forceFill(['handled_by' => $this->user->id, 'handled_at' => now()])->save();
+
+    actingAs($this->user)->patch("/admin/enquiries/{$submission->id}", ['status' => 'new'])->assertRedirect();
+
+    $submission->refresh();
+
+    expect($submission->status)->toBe('new')
+        ->and($submission->handled_by)->toBeNull()
+        ->and($submission->handled_at)->toBeNull();
 });
 
 it('deletes an enquiry', function () {

@@ -17,6 +17,7 @@ class ContactSubmissionController extends Controller
         $status = $request->string('status')->toString();
 
         $submissions = ContactSubmission::query()
+            ->with('handledBy')
             ->when(in_array($status, ContactSubmission::STATUSES, true), fn ($q) => $q->where('status', $status))
             ->latest()
             ->get()
@@ -28,6 +29,8 @@ class ContactSubmissionController extends Controller
                 'subject' => $s->subject,
                 'message' => $s->message,
                 'status' => $s->status,
+                'handled_by' => $s->handledBy?->name,
+                'handled_at' => $s->handled_at?->format('j M Y, g:i a'),
                 'created_at' => $s->created_at?->format('j M Y, g:i a'),
             ]);
 
@@ -40,10 +43,7 @@ class ContactSubmissionController extends Controller
 
     public function show(ContactSubmission $submission): Response
     {
-        // Opening an enquiry marks it as handled.
-        if ($submission->status === 'new') {
-            $submission->update(['status' => 'handled']);
-        }
+        $submission->loadMissing('handledBy');
 
         return Inertia::render('admin/enquiries/show', [
             'submission' => [
@@ -54,6 +54,8 @@ class ContactSubmissionController extends Controller
                 'subject' => $submission->subject,
                 'message' => $submission->message,
                 'status' => $submission->status,
+                'handled_by' => $submission->handledBy?->name,
+                'handled_at' => $submission->handled_at?->format('j M Y, g:i a'),
                 'created_at' => $submission->created_at?->format('j M Y, g:i a'),
             ],
         ]);
@@ -65,7 +67,17 @@ class ContactSubmissionController extends Controller
             'status' => ['required', Rule::in(ContactSubmission::STATUSES)],
         ]);
 
-        $submission->update($data);
+        $submission->status = $data['status'];
+
+        if ($data['status'] === 'handled') {
+            $submission->handled_by = $request->user()->id;
+            $submission->handled_at = now();
+        } else {
+            $submission->handled_by = null;
+            $submission->handled_at = null;
+        }
+
+        $submission->save();
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Enquiry updated.']);
 
