@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('media_folders')) {
+            return;
+        }
+
         Schema::create('media_folders', function (Blueprint $table) {
             $table->id();
             $table->string('name');
