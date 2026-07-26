@@ -48,6 +48,7 @@ it('creates a talent with media chosen from the file manager', function () {
         'full_name' => 'Test Winger',
         'status' => 'published',
         'is_featured' => '1',
+        'available_for_trial' => '1',
         'sort_order' => 0,
         'photo' => 'media/2026/07/player.jpg',
         'gallery_images' => ['media/2026/07/a.jpg', 'media/2026/07/b.jpg'],
@@ -60,6 +61,7 @@ it('creates a talent with media chosen from the file manager', function () {
 
     expect($talent)->not->toBeNull()
         ->and($talent->is_featured)->toBeTrue()
+        ->and($talent->available_for_trial)->toBeTrue()
         ->and($talent->slug)->toBe('test-winger')
         ->and($talent->career_history)->toHaveCount(1) // empty row dropped
         ->and($talent->photo)->toBe('media/2026/07/player.jpg')

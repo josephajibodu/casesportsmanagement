@@ -49,6 +49,7 @@ class TalentFactory extends Factory
             ],
             'gallery_images' => null,
             'is_featured' => fake()->boolean(30),
+            'available_for_trial' => false,
             'status' => 'published',
             'sort_order' => fake()->numberBetween(0, 100),
             'meta_title' => null,
@@ -69,5 +70,10 @@ class TalentFactory extends Factory
     public function coach(): static
     {
         return $this->state(fn (array $attributes) => ['type' => 'coach']);
+    }
+
+    public function availableForTrial(): static
+    {
+        return $this->state(fn (array $attributes) => ['available_for_trial' => true]);
     }
 }

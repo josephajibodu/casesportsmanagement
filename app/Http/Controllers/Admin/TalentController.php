@@ -87,6 +87,7 @@ class TalentController extends Controller
                 'videos' => collect($talent->video_files ?? [])->map(fn ($p) => ['path' => $p, 'url' => media_url($p)])->values(),
                 'gallery' => collect($talent->gallery_images ?? [])->map(fn ($p) => ['path' => $p, 'url' => media_url($p)])->values(),
                 'is_featured' => $talent->is_featured,
+                'available_for_trial' => $talent->available_for_trial,
                 'status' => $talent->status,
                 'sort_order' => $talent->sort_order,
                 'meta_title' => $talent->meta_title,

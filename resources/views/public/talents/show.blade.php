@@ -74,6 +74,9 @@
                     @if ($talent->shirt_number)
                         <span class="rounded-full border border-gold-400/30 bg-gold-400/10 px-3 py-1 font-condensed text-xs font-semibold uppercase tracking-wider text-gold-400">No. {{ $talent->shirt_number }}</span>
                     @endif
+                    @if ($talent->available_for_trial)
+                        <span class="rounded-full bg-gold-400 px-3 py-1 font-condensed text-xs font-semibold uppercase tracking-wider text-ink">Available for Trial</span>
+                    @endif
                 </div>
 
                 <h1 class="mt-5 font-serif text-4xl font-semibold text-white sm:text-5xl">{{ $talent->full_name }}</h1>

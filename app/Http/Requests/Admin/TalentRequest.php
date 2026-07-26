@@ -41,6 +41,7 @@ class TalentRequest extends FormRequest
             'market_value' => ['nullable', 'string', 'max:40'],
             'biography' => ['nullable', 'string', 'max:10000'],
             'is_featured' => ['boolean'],
+            'available_for_trial' => ['boolean'],
             'status' => ['required', Rule::in(Talent::STATUSES)],
             'sort_order' => ['nullable', 'integer', 'min:0'],
             'meta_title' => ['nullable', 'string', 'max:160'],
@@ -69,6 +70,7 @@ class TalentRequest extends FormRequest
     {
         $this->merge([
             'is_featured' => $this->boolean('is_featured'),
+            'available_for_trial' => $this->boolean('available_for_trial'),
         ]);
     }
 }

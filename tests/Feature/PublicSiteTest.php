@@ -48,6 +48,20 @@ it('404s when a player slug is requested under the coaches route', function () {
     get(route('coaches.show', $this->talent))->assertNotFound();
 });
 
+it('shows trial availability on a player profile when enabled', function () {
+    $available = Talent::factory()->player()->availableForTrial()->create(['status' => 'published']);
+
+    get(route('players.show', $available))
+        ->assertOk()
+        ->assertSee('Available for Trial');
+});
+
+it('hides trial availability on a player profile when disabled', function () {
+    get(route('players.show', $this->talent))
+        ->assertOk()
+        ->assertDontSee('Available for Trial');
+});
+
 it('renders a news article', function () {
     get(route('news.show', $this->article))
         ->assertOk()

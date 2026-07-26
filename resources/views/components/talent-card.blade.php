@@ -38,6 +38,11 @@
     </div>
 
     <div class="absolute inset-x-0 bottom-0 p-5">
+        @if ($talent->available_for_trial)
+            <span class="mb-2 inline-block rounded-full bg-gold-400 px-2.5 py-0.5 font-condensed text-[0.65rem] font-semibold uppercase tracking-wider text-ink">
+                Available for Trial
+            </span>
+        @endif
         <h3 class="font-serif text-xl font-semibold text-white">{{ $talent->full_name }}</h3>
         <div class="mt-1 flex items-center gap-2 text-sm text-mist-dim">
             @if ($talent->current_club)<span>{{ $talent->current_club }}</span>@endif

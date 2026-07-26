@@ -37,6 +37,7 @@ use Illuminate\Support\Str;
  * @property array<int, array{label: string, url: string}>|null $video_links
  * @property array<int, string>|null $gallery_images
  * @property bool $is_featured
+ * @property bool $available_for_trial
  * @property string $status
  * @property int $sort_order
  * @property string|null $meta_title
@@ -49,7 +50,7 @@ use Illuminate\Support\Str;
     'secondary_nationality', 'height_cm', 'weight_kg', 'preferred_foot',
     'current_club', 'contract_status', 'contract_until', 'market_value',
     'biography', 'career_history', 'video_links', 'video_files',
-    'gallery_images', 'is_featured', 'status', 'sort_order',
+    'gallery_images', 'is_featured', 'available_for_trial', 'status', 'sort_order',
     'meta_title', 'meta_description',
 ])]
 class Talent extends Model
@@ -81,6 +82,7 @@ class Talent extends Model
             'video_files' => 'array',
             'gallery_images' => 'array',
             'is_featured' => 'boolean',
+            'available_for_trial' => 'boolean',
         ];
     }
 

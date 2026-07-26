@@ -35,6 +35,7 @@ type Talent = {
     videos: Stored[];
     gallery: Stored[];
     is_featured: boolean;
+    available_for_trial: boolean;
     status: string;
     sort_order: number;
     meta_title: string | null;
@@ -82,6 +83,7 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
         status: string;
         sort_order: number;
         is_featured: boolean;
+        available_for_trial: boolean;
         meta_title: string;
         meta_description: string;
         photo: PickedFile | null;
@@ -111,6 +113,7 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
         status: talent?.status ?? 'draft',
         sort_order: talent?.sort_order ?? 0,
         is_featured: talent?.is_featured ?? false,
+        available_for_trial: talent?.available_for_trial ?? false,
         meta_title: talent?.meta_title ?? '',
         meta_description: talent?.meta_description ?? '',
         photo: talent?.photo ? { path: talent.photo, url: talent.photo_url } : null,
@@ -291,6 +294,17 @@ export default function TalentForm({ talent, options }: { talent: Talent | null;
                                 <input type="checkbox" checked={data.is_featured} onChange={(e) => setData('is_featured', e.target.checked)} className="size-4 rounded border-input" />
                                 <span className="text-sm font-medium">Featured on homepage</span>
                             </label>
+                            {isPlayer && (
+                                <label className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        checked={data.available_for_trial}
+                                        onChange={(e) => setData('available_for_trial', e.target.checked)}
+                                        className="size-4 rounded border-input"
+                                    />
+                                    <span className="text-sm font-medium">Available for trial</span>
+                                </label>
+                            )}
                             <div className="grid gap-5 sm:grid-cols-2">
                                 <Field label="Slug" htmlFor="slug" hint="Leave blank to auto-generate" error={errors.slug}>
                                     <Input id="slug" value={data.slug} onChange={(e) => setData('slug', e.target.value)} placeholder="auto-generated" />
