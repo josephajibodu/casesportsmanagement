@@ -133,118 +133,122 @@ export default function EnquiriesIndex({
                 </div>
 
                 <div className="mt-4 overflow-hidden rounded-xl border bg-card shadow-sm">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
-                            <tr>
-                                <th className="w-10 p-3">
-                                    <Checkbox
-                                        checked={isIndeterminate ? 'indeterminate' : isAllSelected}
-                                        onCheckedChange={toggleAll}
-                                        aria-label="Select all"
-                                    />
-                                </th>
-                                <th className="p-3 font-medium">From</th>
-                                <th className="hidden p-3 font-medium md:table-cell">Message</th>
-                                <th className="hidden p-3 font-medium lg:table-cell">Received</th>
-                                <th className="p-3 font-medium">Status</th>
-                                <th className="w-12 p-3" />
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {visible.length === 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <td colSpan={6} className="p-12 text-center text-muted-foreground">
-                                        <div className="flex flex-col items-center gap-2">
-                                            <Inbox className="size-8 text-muted-foreground/50" />
-                                            {submissions.length === 0 ? (
-                                                <span>No enquiries yet.</span>
-                                            ) : (
-                                                <span>No enquiries match your search.</span>
-                                            )}
-                                        </div>
-                                    </td>
+                                    <th className="w-10 p-3">
+                                        <Checkbox
+                                            checked={isIndeterminate ? 'indeterminate' : isAllSelected}
+                                            onCheckedChange={toggleAll}
+                                            aria-label="Select all"
+                                        />
+                                    </th>
+                                    <th className="p-3 font-medium">From</th>
+                                    <th className="p-3 font-medium">Message</th>
+                                    <th className="p-3 font-medium">Received</th>
+                                    <th className="p-3 font-medium">Status</th>
+                                    <th className="w-12 p-3" />
                                 </tr>
-                            )}
-                            {visible.map((row) => {
-                                const unread = row.status === 'new';
-
-                                return (
-                                    <tr key={row.id} className="group hover:bg-accent/30">
-                                        <td className="p-3">
-                                            <Checkbox
-                                                checked={selected.has(row.id)}
-                                                onCheckedChange={() => toggle(row.id)}
-                                                aria-label={`Select enquiry from ${row.name}`}
-                                            />
-                                        </td>
-                                        <td className="p-3">
-                                            <Link href={`/admin/enquiries/${row.id}`} className="flex items-center gap-3">
-                                                <span className="relative shrink-0">
-                                                    <Avatar>
-                                                        <AvatarFallback className={avatarColor(row.name)}>
-                                                            {getInitials(row.name)}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                    {unread && (
-                                                        <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-primary ring-2 ring-card" />
-                                                    )}
-                                                </span>
-                                                <div className="min-w-0">
-                                                    <div className={unread ? 'font-semibold' : 'font-medium'}>{row.name}</div>
-                                                    <div className="truncate text-xs text-muted-foreground">{row.email}</div>
-                                                </div>
-                                            </Link>
-                                        </td>
-                                        <td className="hidden max-w-xs p-3 md:table-cell">
-                                            <Link href={`/admin/enquiries/${row.id}`} className="block">
-                                                <div className={`truncate ${unread ? 'font-medium' : ''}`}>{row.subject ?? 'Website enquiry'}</div>
-                                                <div className="truncate text-xs text-muted-foreground">{row.message}</div>
-                                            </Link>
-                                        </td>
-                                        <td className="hidden p-3 whitespace-nowrap text-muted-foreground lg:table-cell">{row.created_at}</td>
-                                        <td className="p-3">
-                                            <Badge variant={unread ? 'default' : 'secondary'} className="uppercase">
-                                                {row.status}
-                                            </Badge>
-                                            {!unread && row.handled_by && (
-                                                <Tooltip>
-                                                    <TooltipTrigger asChild>
-                                                        <div className="mt-1 truncate text-xs text-muted-foreground">by {row.handled_by}</div>
-                                                    </TooltipTrigger>
-                                                    <TooltipContent>{row.handled_at ?? row.handled_by}</TooltipContent>
-                                                </Tooltip>
-                                            )}
-                                        </td>
-                                        <td className="p-3">
-                                            <div className="flex justify-end">
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button variant="ghost" size="icon" aria-label="Actions">
-                                                            <MoreHorizontal className="size-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent align="end">
-                                                        {unread ? (
-                                                            <DropdownMenuItem onClick={() => setStatus(row, 'handled')}>
-                                                                <CheckCircle2 className="size-4" /> Mark as handled
-                                                            </DropdownMenuItem>
-                                                        ) : (
-                                                            <DropdownMenuItem onClick={() => setStatus(row, 'new')}>
-                                                                <MailOpen className="size-4" /> Mark as new
-                                                            </DropdownMenuItem>
-                                                        )}
-                                                        <DropdownMenuItem variant="destructive" onClick={() => destroy(row)}>
-                                                            <Trash2 className="size-4" /> Delete
-                                                        </DropdownMenuItem>
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
+                            </thead>
+                            <tbody className="divide-y">
+                                {visible.length === 0 && (
+                                    <tr>
+                                        <td colSpan={6} className="p-12 text-center text-muted-foreground">
+                                            <div className="flex flex-col items-center gap-2">
+                                                <Inbox className="size-8 text-muted-foreground/50" />
+                                                {submissions.length === 0 ? (
+                                                    <span>No enquiries yet.</span>
+                                                ) : (
+                                                    <span>No enquiries match your search.</span>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                )}
+                                {visible.map((row) => {
+                                    const unread = row.status === 'new';
+
+                                    return (
+                                        <tr
+                                            key={row.id}
+                                            className="group cursor-pointer hover:bg-accent/30"
+                                            onClick={() => router.visit(`/admin/enquiries/${row.id}`)}
+                                        >
+                                            <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                                <Checkbox
+                                                    checked={selected.has(row.id)}
+                                                    onCheckedChange={() => toggle(row.id)}
+                                                    aria-label={`Select enquiry from ${row.name}`}
+                                                />
+                                            </td>
+                                            <td className="p-3">
+                                                <div className="flex items-center gap-3">
+                                                    <span className="relative shrink-0">
+                                                        <Avatar>
+                                                            <AvatarFallback className={avatarColor(row.name)}>
+                                                                {getInitials(row.name)}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                        {unread && (
+                                                            <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-primary ring-2 ring-card" />
+                                                        )}
+                                                    </span>
+                                                    <div className="min-w-0">
+                                                        <div className={`whitespace-nowrap ${unread ? 'font-semibold' : 'font-medium'}`}>{row.name}</div>
+                                                        <div className="whitespace-nowrap text-xs text-muted-foreground">{row.email}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="max-w-xs p-3">
+                                                <div className={`truncate ${unread ? 'font-medium' : ''}`}>{row.subject ?? 'Website enquiry'}</div>
+                                                <div className="truncate text-xs text-muted-foreground">{row.message}</div>
+                                            </td>
+                                            <td className="p-3 whitespace-nowrap text-muted-foreground">{row.created_at}</td>
+                                            <td className="p-3 whitespace-nowrap">
+                                                <Badge variant={unread ? 'default' : 'secondary'} className="uppercase">
+                                                    {row.status}
+                                                </Badge>
+                                                {!unread && row.handled_by && (
+                                                    <Tooltip>
+                                                        <TooltipTrigger asChild>
+                                                            <div className="mt-1 truncate text-xs text-muted-foreground">by {row.handled_by}</div>
+                                                        </TooltipTrigger>
+                                                        <TooltipContent>{row.handled_at ?? row.handled_by}</TooltipContent>
+                                                    </Tooltip>
+                                                )}
+                                            </td>
+                                            <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex justify-end">
+                                                    <DropdownMenu>
+                                                        <DropdownMenuTrigger asChild>
+                                                            <Button variant="ghost" size="icon" aria-label="Actions">
+                                                                <MoreHorizontal className="size-4" />
+                                                            </Button>
+                                                        </DropdownMenuTrigger>
+                                                        <DropdownMenuContent align="end">
+                                                            {unread ? (
+                                                                <DropdownMenuItem onClick={() => setStatus(row, 'handled')}>
+                                                                    <CheckCircle2 className="size-4" /> Mark as handled
+                                                                </DropdownMenuItem>
+                                                            ) : (
+                                                                <DropdownMenuItem onClick={() => setStatus(row, 'new')}>
+                                                                    <MailOpen className="size-4" /> Mark as new
+                                                                </DropdownMenuItem>
+                                                            )}
+                                                            <DropdownMenuItem variant="destructive" onClick={() => destroy(row)}>
+                                                                <Trash2 className="size-4" /> Delete
+                                                            </DropdownMenuItem>
+                                                        </DropdownMenuContent>
+                                                    </DropdownMenu>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </AdminPage>
         </>

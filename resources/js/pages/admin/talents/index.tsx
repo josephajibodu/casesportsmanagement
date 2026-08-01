@@ -69,105 +69,111 @@ export default function TalentsIndex({ talents }: { talents: TalentRow[] }) {
                 </PageHeader>
 
                 <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
-                            <tr>
-                                <th className="w-10 p-3">
-                                    <Checkbox
-                                        checked={isIndeterminate ? 'indeterminate' : isAllSelected}
-                                        onCheckedChange={toggleAll}
-                                        aria-label="Select all"
-                                    />
-                                </th>
-                                <th className="p-3 font-medium">Name</th>
-                                <th className="p-3 font-medium">Type</th>
-                                <th className="hidden p-3 font-medium sm:table-cell">Position</th>
-                                <th className="p-3 font-medium">Status</th>
-                                <th className="p-3 font-medium">Featured</th>
-                                <th className="p-3 text-right font-medium">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {talents.length === 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                                        No profiles yet. Add your first player or coach.
-                                    </td>
-                                </tr>
-                            )}
-                            {talents.map((row) => (
-                                <tr key={row.id} className="hover:bg-accent/30">
-                                    <td className="p-3">
+                                    <th className="w-10 p-3">
                                         <Checkbox
-                                            checked={selected.has(row.id)}
-                                            onCheckedChange={() => toggle(row.id)}
-                                            aria-label={`Select ${row.full_name}`}
+                                            checked={isIndeterminate ? 'indeterminate' : isAllSelected}
+                                            onCheckedChange={toggleAll}
+                                            aria-label="Select all"
                                         />
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="flex items-center gap-3">
-                                            <div className="size-9 shrink-0 overflow-hidden rounded-full bg-muted">
-                                                {row.photo_url && (
-                                                    <img src={row.photo_url} alt="" className="size-full object-cover" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <div className="font-medium">{row.full_name}</div>
-                                                <div className="text-xs text-muted-foreground">{row.nationality}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="p-3 capitalize">{row.type}</td>
-                                    <td className="hidden p-3 sm:table-cell">{row.position ?? '—'}</td>
-                                    <td className="p-3">
-                                        <Badge variant={row.status === 'published' ? 'default' : 'secondary'}>
-                                            {row.status}
-                                        </Badge>
-                                    </td>
-                                    <td className="p-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleFeatured(row)}
-                                            aria-label="Toggle featured"
-                                        >
-                                            <Star
-                                                className={
-                                                    row.is_featured
-                                                        ? 'size-5 fill-amber-400 text-amber-400'
-                                                        : 'size-5 text-muted-foreground'
-                                                }
-                                            />
-                                        </button>
-                                    </td>
-                                    <td className="p-3">
-                                        <div className="flex justify-end gap-1">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => copyToClipboard(row.public_url)}
-                                                aria-label="Copy shareable link"
-                                            >
-                                                <Link2 className="size-4" />
-                                            </Button>
-                                            <Button asChild variant="ghost" size="icon">
-                                                <Link href={`/admin/talents/${row.id}/edit`} aria-label="Edit">
-                                                    <Pencil className="size-4" />
-                                                </Link>
-                                            </Button>
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                onClick={() => destroy(row)}
-                                                aria-label="Delete"
-                                            >
-                                                <Trash2 className="size-4 text-destructive" />
-                                            </Button>
-                                        </div>
-                                    </td>
+                                    </th>
+                                    <th className="p-3 font-medium">Name</th>
+                                    <th className="p-3 font-medium">Type</th>
+                                    <th className="p-3 font-medium">Position</th>
+                                    <th className="p-3 font-medium">Status</th>
+                                    <th className="p-3 font-medium">Featured</th>
+                                    <th className="p-3 text-right font-medium">Actions</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y">
+                                {talents.length === 0 && (
+                                    <tr>
+                                        <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                                            No profiles yet. Add your first player or coach.
+                                        </td>
+                                    </tr>
+                                )}
+                                {talents.map((row) => (
+                                    <tr
+                                        key={row.id}
+                                        className="cursor-pointer hover:bg-accent/30"
+                                        onClick={() => router.visit(`/admin/talents/${row.id}/edit`)}
+                                    >
+                                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                            <Checkbox
+                                                checked={selected.has(row.id)}
+                                                onCheckedChange={() => toggle(row.id)}
+                                                aria-label={`Select ${row.full_name}`}
+                                            />
+                                        </td>
+                                        <td className="p-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="size-9 shrink-0 overflow-hidden rounded-full bg-muted">
+                                                    {row.photo_url && (
+                                                        <img src={row.photo_url} alt="" className="size-full object-cover" />
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="font-medium whitespace-nowrap">{row.full_name}</div>
+                                                    <div className="text-xs whitespace-nowrap text-muted-foreground">{row.nationality}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="p-3 whitespace-nowrap capitalize">{row.type}</td>
+                                        <td className="p-3 whitespace-nowrap">{row.position ?? '—'}</td>
+                                        <td className="p-3">
+                                            <Badge variant={row.status === 'published' ? 'default' : 'secondary'}>
+                                                {row.status}
+                                            </Badge>
+                                        </td>
+                                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                            <button
+                                                type="button"
+                                                onClick={() => toggleFeatured(row)}
+                                                aria-label="Toggle featured"
+                                            >
+                                                <Star
+                                                    className={
+                                                        row.is_featured
+                                                            ? 'size-5 fill-amber-400 text-amber-400'
+                                                            : 'size-5 text-muted-foreground'
+                                                    }
+                                                />
+                                            </button>
+                                        </td>
+                                        <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                            <div className="flex justify-end gap-1">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => copyToClipboard(row.public_url)}
+                                                    aria-label="Copy shareable link"
+                                                >
+                                                    <Link2 className="size-4" />
+                                                </Button>
+                                                <Button asChild variant="ghost" size="icon">
+                                                    <Link href={`/admin/talents/${row.id}/edit`} aria-label="Edit">
+                                                        <Pencil className="size-4" />
+                                                    </Link>
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => destroy(row)}
+                                                    aria-label="Delete"
+                                                >
+                                                    <Trash2 className="size-4 text-destructive" />
+                                                </Button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </AdminPage>
         </>

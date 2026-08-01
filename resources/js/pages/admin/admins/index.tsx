@@ -64,67 +64,73 @@ export default function AdminsIndex({ admins }: { admins: Admin[] }) {
                 </PageHeader>
 
                 <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-                    <table className="w-full text-sm">
-                        <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
-                            <tr>
-                                <th className="p-3 font-medium">Name</th>
-                                <th className="p-3 font-medium">Email</th>
-                                <th className="hidden p-3 font-medium sm:table-cell">Added</th>
-                                <th className="p-3 text-right font-medium">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y">
-                            {admins.length === 0 && (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
                                 <tr>
-                                    <td colSpan={4} className="p-8 text-center text-muted-foreground">
-                                        No admins yet.
-                                    </td>
+                                    <th className="p-3 font-medium">Name</th>
+                                    <th className="p-3 font-medium">Email</th>
+                                    <th className="p-3 font-medium">Added</th>
+                                    <th className="p-3 text-right font-medium">Actions</th>
                                 </tr>
-                            )}
-                            {admins.map((row) => {
-                                const isSelf = row.id === props.auth.user.id;
-
-                                return (
-                                    <tr key={row.id} className="hover:bg-accent/30">
-                                        <td className="p-3">
-                                            <div className="font-medium">
-                                                {row.name}
-                                                {isSelf && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}
-                                            </div>
-                                        </td>
-                                        <td className="p-3 text-muted-foreground">{row.email}</td>
-                                        <td className="hidden p-3 text-muted-foreground sm:table-cell">{row.created_at ?? '—'}</td>
-                                        <td className="p-3">
-                                            <div className="flex justify-end gap-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => resetPassword(row)}
-                                                    aria-label="Generate new password"
-                                                >
-                                                    <KeyRound className="size-4" />
-                                                </Button>
-                                                <Button asChild variant="ghost" size="icon">
-                                                    <Link href={`/admin/admins/${row.id}/edit`} aria-label="Edit">
-                                                        <Pencil className="size-4" />
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => destroy(row)}
-                                                    disabled={isSelf}
-                                                    aria-label="Delete"
-                                                >
-                                                    <Trash2 className="size-4 text-destructive" />
-                                                </Button>
-                                            </div>
+                            </thead>
+                            <tbody className="divide-y">
+                                {admins.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="p-8 text-center text-muted-foreground">
+                                            No admins yet.
                                         </td>
                                     </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
+                                )}
+                                {admins.map((row) => {
+                                    const isSelf = row.id === props.auth.user.id;
+
+                                    return (
+                                        <tr
+                                            key={row.id}
+                                            className="cursor-pointer hover:bg-accent/30"
+                                            onClick={() => router.visit(`/admin/admins/${row.id}/edit`)}
+                                        >
+                                            <td className="p-3 whitespace-nowrap">
+                                                <div className="font-medium">
+                                                    {row.name}
+                                                    {isSelf && <span className="ml-2 text-xs text-muted-foreground">(you)</span>}
+                                                </div>
+                                            </td>
+                                            <td className="p-3 whitespace-nowrap text-muted-foreground">{row.email}</td>
+                                            <td className="p-3 whitespace-nowrap text-muted-foreground">{row.created_at ?? '—'}</td>
+                                            <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                                                <div className="flex justify-end gap-1">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => resetPassword(row)}
+                                                        aria-label="Generate new password"
+                                                    >
+                                                        <KeyRound className="size-4" />
+                                                    </Button>
+                                                    <Button asChild variant="ghost" size="icon">
+                                                        <Link href={`/admin/admins/${row.id}/edit`} aria-label="Edit">
+                                                            <Pencil className="size-4" />
+                                                        </Link>
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => destroy(row)}
+                                                        disabled={isSelf}
+                                                        aria-label="Delete"
+                                                    >
+                                                        <Trash2 className="size-4 text-destructive" />
+                                                    </Button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </AdminPage>
 
