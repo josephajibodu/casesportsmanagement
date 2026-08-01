@@ -2,6 +2,7 @@ import { FolderOpen, Upload } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
 import { Breadcrumbs } from './breadcrumbs';
 import { ConfirmDialog, MoveDialog, PromptDialog } from './dialogs';
@@ -38,6 +39,9 @@ export function FileManager({
     className?: string;
     contentClassName?: string;
 }) {
+    const isMobile = useIsMobile();
+    const view = isMobile ? 'list' : fm.view;
+
     const [uploadOpen, setUploadOpen] = useState(false);
     const [droppedFiles, setDroppedFiles] = useState<File[]>([]);
     const [dragging, setDragging] = useState(false);
@@ -106,8 +110,9 @@ export function FileManager({
                 onNewFolder={() => setNewFolderOpen(true)}
                 onUpload={handleUploadClick}
                 onRefresh={fm.refresh}
-                view={fm.view}
+                view={view}
                 onViewChange={fm.setView}
+                hideViewToggle={isMobile}
                 sort={fm.sort}
                 direction={fm.direction}
                 onSortChange={fm.setSort}
@@ -181,7 +186,7 @@ export function FileManager({
                                     </Button>
                                 )}
                             </div>
-                        ) : fm.view === 'grid' ? (
+                        ) : view === 'grid' ? (
                             <FileGrid {...browserProps} />
                         ) : (
                             <FileList {...browserProps} sort={fm.sort} direction={fm.direction} onToggleSort={fm.toggleSort} />

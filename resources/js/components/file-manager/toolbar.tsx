@@ -32,6 +32,7 @@ export function Toolbar({
     onSortChange,
     onDirectionChange,
     loading,
+    hideViewToggle,
 }: {
     search: string;
     onSearch: (value: string) => void;
@@ -45,6 +46,8 @@ export function Toolbar({
     onSortChange: (sort: SortKey) => void;
     onDirectionChange: (direction: SortDirection) => void;
     loading?: boolean;
+    /** Mobile forces list view, so the grid/list toggle has nothing to do. */
+    hideViewToggle?: boolean;
 }) {
     return (
         <div className="flex flex-wrap items-center gap-2">
@@ -102,24 +105,26 @@ export function Toolbar({
                     </DropdownMenuContent>
                 </DropdownMenu>
 
-                <div className="flex items-center rounded-md border p-0.5">
-                    <button
-                        type="button"
-                        onClick={() => onViewChange('grid')}
-                        aria-label="Grid view"
-                        className={cn('rounded p-1.5 transition', view === 'grid' ? 'bg-accent' : 'text-muted-foreground')}
-                    >
-                        <Grid3x3 className="size-4" />
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => onViewChange('list')}
-                        aria-label="List view"
-                        className={cn('rounded p-1.5 transition', view === 'list' ? 'bg-accent' : 'text-muted-foreground')}
-                    >
-                        <List className="size-4" />
-                    </button>
-                </div>
+                {!hideViewToggle && (
+                    <div className="flex items-center rounded-md border p-0.5">
+                        <button
+                            type="button"
+                            onClick={() => onViewChange('grid')}
+                            aria-label="Grid view"
+                            className={cn('rounded p-1.5 transition', view === 'grid' ? 'bg-accent' : 'text-muted-foreground')}
+                        >
+                            <Grid3x3 className="size-4" />
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => onViewChange('list')}
+                            aria-label="List view"
+                            className={cn('rounded p-1.5 transition', view === 'list' ? 'bg-accent' : 'text-muted-foreground')}
+                        >
+                            <List className="size-4" />
+                        </button>
+                    </div>
+                )}
 
                 <Button variant="outline" size="icon" onClick={onRefresh} aria-label="Refresh">
                     <RefreshCw className={cn('size-4', loading && 'animate-spin')} />

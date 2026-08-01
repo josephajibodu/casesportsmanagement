@@ -107,7 +107,7 @@ export function FileCard({
                 onClick={handleClick}
                 onDoubleClick={() => actions.onPreview(file)}
                 className={cn(
-                    'border-b transition',
+                    'group border-b transition',
                     selectable ? 'cursor-pointer hover:bg-accent/40' : 'opacity-40',
                     selected && 'bg-primary/10',
                 )}
@@ -126,10 +126,15 @@ export function FileCard({
                         </div>
                     </div>
                 </td>
-                <td className="px-3 py-2 text-sm text-muted-foreground capitalize">{file.type}</td>
-                <td className="px-3 py-2 text-sm text-muted-foreground">{file.size_for_humans}</td>
-                <td className="px-3 py-2 text-sm text-muted-foreground">{file.created_at_for_humans}</td>
-                <td className="px-3 py-2 text-right">
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground capitalize">{file.type}</td>
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground">{file.size_for_humans}</td>
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground">{file.created_at_for_humans}</td>
+                <td
+                    className={cn(
+                        'sticky right-0 px-3 py-2 text-right',
+                        selected ? 'bg-primary/10' : 'bg-background group-hover:bg-accent/40',
+                    )}
+                >
                     <ActionsMenu file={file} actions={actions} />
                 </td>
             </tr>

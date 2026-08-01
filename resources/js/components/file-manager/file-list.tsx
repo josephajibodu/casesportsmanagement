@@ -48,53 +48,62 @@ export function FileList({
 
     return (
         <div className="overflow-hidden rounded-xl border">
-            <table className="w-full text-sm">
-                <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
-                    <tr>
-                        {COLUMNS.map((column) => (
-                            <th key={column.label} className={cn('px-3 py-2 font-medium', column.className)}>
-                                {column.key ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => onToggleSort(column.key as SortKey)}
-                                        className="inline-flex items-center gap-1 hover:text-foreground"
-                                    >
-                                        {column.label}
-                                        {sort === column.key &&
-                                            (direction === 'asc' ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
-                                    </button>
-                                ) : (
-                                    column.label
-                                )}
-                            </th>
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                    <thead className="bg-muted/40 text-left text-xs text-muted-foreground uppercase">
+                        <tr>
+                            {COLUMNS.map((column) => (
+                                <th
+                                    key={column.label}
+                                    className={cn(
+                                        'px-3 py-2 font-medium whitespace-nowrap',
+                                        column.key === null && 'sticky right-0 bg-muted/40',
+                                        column.className,
+                                    )}
+                                >
+                                    {column.key ? (
+                                        <button
+                                            type="button"
+                                            onClick={() => onToggleSort(column.key as SortKey)}
+                                            className="inline-flex items-center gap-1 hover:text-foreground"
+                                        >
+                                            {column.label}
+                                            {sort === column.key &&
+                                                (direction === 'asc' ? <ArrowUp className="size-3" /> : <ArrowDown className="size-3" />)}
+                                        </button>
+                                    ) : (
+                                        column.label
+                                    )}
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {folders.map((folder) => (
+                            <FolderCard
+                                key={`folder-${folder.id}`}
+                                folder={folder}
+                                view="list"
+                                onOpen={() => onOpenFolder(folder.id)}
+                                onRename={() => onRenameFolder(folder)}
+                                onDelete={() => onDeleteFolder(folder)}
+                                onDropFile={(fileId) => onDropFileInFolder(fileId, folder.id)}
+                            />
                         ))}
-                    </tr>
-                </thead>
-                <tbody>
-                    {folders.map((folder) => (
-                        <FolderCard
-                            key={`folder-${folder.id}`}
-                            folder={folder}
-                            view="list"
-                            onOpen={() => onOpenFolder(folder.id)}
-                            onRename={() => onRenameFolder(folder)}
-                            onDelete={() => onDeleteFolder(folder)}
-                            onDropFile={(fileId) => onDropFileInFolder(fileId, folder.id)}
-                        />
-                    ))}
-                    {files.map((file) => (
-                        <FileCard
-                            key={`file-${file.id}`}
-                            file={file}
-                            view="list"
-                            selected={selectedIds.includes(file.id)}
-                            selectable={isSelectable(file)}
-                            onSelect={onSelectFile}
-                            actions={fileActions}
-                        />
-                    ))}
-                </tbody>
-            </table>
+                        {files.map((file) => (
+                            <FileCard
+                                key={`file-${file.id}`}
+                                file={file}
+                                view="list"
+                                selected={selectedIds.includes(file.id)}
+                                selectable={isSelectable(file)}
+                                onSelect={onSelectFile}
+                                actions={fileActions}
+                            />
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

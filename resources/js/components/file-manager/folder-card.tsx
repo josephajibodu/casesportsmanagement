@@ -71,20 +71,27 @@ export function FolderCard({
             <tr
                 {...dropProps}
                 onDoubleClick={onOpen}
-                className={cn('cursor-pointer border-b transition hover:bg-accent/40', isOver && 'bg-primary/10')}
+                className={cn('group cursor-pointer border-b transition hover:bg-accent/40', isOver && 'bg-primary/10')}
             >
                 <td className="px-3 py-2">
                     <button type="button" onClick={onOpen} className="flex items-center gap-3 text-left">
                         <Folder className="size-5 shrink-0 fill-primary/20 text-primary" />
-                        <span className="font-medium">{folder.name}</span>
+                        <span className="font-medium whitespace-nowrap">{folder.name}</span>
                     </button>
                 </td>
-                <td className="px-3 py-2 text-sm text-muted-foreground">Folder</td>
-                <td className="px-3 py-2 text-sm text-muted-foreground">
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground">Folder</td>
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground">
                     {folder.files_count ?? 0} {folder.files_count === 1 ? 'file' : 'files'}
                 </td>
-                <td className="px-3 py-2 text-sm text-muted-foreground">—</td>
-                <td className="px-3 py-2 text-right">{menu}</td>
+                <td className="px-3 py-2 text-sm whitespace-nowrap text-muted-foreground">—</td>
+                <td
+                    className={cn(
+                        'sticky right-0 px-3 py-2 text-right',
+                        isOver ? 'bg-primary/10' : 'bg-background group-hover:bg-accent/40',
+                    )}
+                >
+                    {menu}
+                </td>
             </tr>
         );
     }
