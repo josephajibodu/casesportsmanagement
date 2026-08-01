@@ -51,12 +51,16 @@ export function FilePreview({
 
     return (
         <Dialog open={!!file} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="max-w-5xl gap-0 overflow-hidden p-0">
+            {/* sm:max-w-5xl (not a plain max-w-5xl) leaves the base dialog's
+                mobile-safe `max-w-[calc(100%-2rem)]` in place; a plain
+                max-w-5xl is the same utility category and would replace it,
+                letting the modal run edge-to-edge on phones. */}
+            <DialogContent className="max-h-[90vh] gap-0 overflow-y-auto p-0 sm:max-w-5xl">
                 <DialogTitle className="sr-only">{file.name}</DialogTitle>
 
                 <div className="grid lg:grid-cols-[1fr_280px]">
                     {/* Stage */}
-                    <div className="relative flex h-[60vh] items-center justify-center overflow-auto bg-muted/50">
+                    <div className="relative flex h-[45vh] items-center justify-center overflow-auto bg-muted/50 sm:h-[60vh]">
                         {file.type === 'image' && file.url ? (
                             <img
                                 src={file.url}

@@ -197,7 +197,7 @@ export function FileManager({
 
             {/* Upload (page mode) */}
             <Dialog open={uploadOpen} onOpenChange={setUploadOpen}>
-                <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+                <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
                     <DialogHeader>
                         <DialogTitle>Upload files</DialogTitle>
                     </DialogHeader>

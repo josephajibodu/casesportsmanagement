@@ -127,7 +127,7 @@ export function ImageEditor({
 
     return (
         <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
                 <DialogHeader>
                     <DialogTitle>Edit image</DialogTitle>
                     <DialogDescription>Crop, rotate, resize and compress before uploading.</DialogDescription>
@@ -135,7 +135,7 @@ export function ImageEditor({
 
                 <div className="grid gap-5 lg:grid-cols-[1fr_260px]">
                     {/* Live preview */}
-                    <div className="relative h-[380px] overflow-hidden rounded-lg bg-muted">
+                    <div className="relative h-[280px] overflow-hidden rounded-lg bg-muted sm:h-[380px]">
                         {src && (
                             <Cropper
                                 image={src}

@@ -49,7 +49,7 @@ export function PromptDialog({
 
     return (
         <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-md">
                 <form onSubmit={submit}>
                     <DialogHeader>
                         <DialogTitle>{title}</DialogTitle>
@@ -93,7 +93,7 @@ export function ConfirmDialog({
 }) {
     return (
         <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     {description && <DialogDescription>{description}</DialogDescription>}
@@ -144,7 +144,7 @@ export function MoveDialog({
 
     return (
         <Dialog open={open} onOpenChange={(next) => !next && onCancel()}>
-            <DialogContent className="max-w-md">
+            <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                     <DialogTitle>Move file</DialogTitle>
                     <DialogDescription>Choose the folder to move this file into.</DialogDescription>
