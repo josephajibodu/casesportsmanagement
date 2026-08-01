@@ -68,11 +68,11 @@ export function Toolbar({
                 )}
             </div>
 
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex items-center gap-2 sm:ml-auto">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="sm">
-                            <ArrowDownUp className="size-4" /> Sort
+                        <Button variant="outline" size="sm" aria-label="Sort">
+                            <ArrowDownUp className="size-4" /> <span className="hidden sm:inline">Sort</span>
                         </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
@@ -125,12 +125,12 @@ export function Toolbar({
                     <RefreshCw className={cn('size-4', loading && 'animate-spin')} />
                 </Button>
 
-                <Button variant="outline" size="sm" onClick={onNewFolder}>
-                    <FolderPlus className="size-4" /> New folder
+                <Button variant="outline" size="sm" onClick={onNewFolder} aria-label="New folder">
+                    <FolderPlus className="size-4" /> <span className="hidden sm:inline">New folder</span>
                 </Button>
 
-                <Button size="sm" onClick={onUpload}>
-                    <Upload className="size-4" /> Upload
+                <Button size="sm" onClick={onUpload} aria-label="Upload">
+                    <Upload className="size-4" /> <span className="hidden sm:inline">Upload</span>
                 </Button>
             </div>
         </div>
